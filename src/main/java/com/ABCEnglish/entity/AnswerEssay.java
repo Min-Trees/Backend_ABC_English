@@ -1,0 +1,23 @@
+package com.ABCEnglish.entity;
+
+import lombok.Getter;
+import lombok.Setter;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "Answer_Essay")
+@Getter
+@Setter
+public class AnswerEssay {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer answerId;
+
+    @ManyToOne
+    @JoinColumn(name = "questionId")
+    private Question question;
+
+    private String userEssay;
+    private Boolean isCorrect;
+}
