@@ -16,11 +16,11 @@ public class UserResponse {
     Integer userId;
     Role role;
     String username;
-    String fullName;
+    String fullname;
     String email;
     String phone;
     String description;
-    String password;
-    Integer level ;
+//    String password;
+//    Integer level ;
     Boolean status;
 }

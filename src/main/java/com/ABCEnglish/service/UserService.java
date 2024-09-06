@@ -7,31 +7,32 @@ import com.ABCEnglish.entity.User;
 import com.ABCEnglish.mapper.UserMapper;
 import com.ABCEnglish.reponsesitory.RoleRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.HashSet;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserService {
-    UserRepository userRepository;
-    UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
-    RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
+    public UserResponse createUser(RegisterRequest request) {
 
-    public UserResponse createUser(RegisterRequest request){
-        Role studentRole = roleRepository.findByName("Student");
+        Role role = roleRepository.findByName("student")
+                .orElseGet(()-> {
+                    Role newRole = new Role();
+                    newRole.setName("student");
+                    return roleRepository.save(newRole);
+                });
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(studentRole);
+        user.setRole(role);
+        user = userRepository.save(user);
         return userMapper.toUserResponse(user);
     }
 }

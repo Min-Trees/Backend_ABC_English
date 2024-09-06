@@ -1,25 +1,13 @@
 package com.ABCEnglish.entity;
 
-import com.ABCEnglish.entity.Role;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-
 @Entity
-@Table(name = "User")
-@Getter
-@Setter
+@Table(name = "Account")
+@Data
 public class User {
 
     @Id
@@ -29,15 +17,22 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "roleId", nullable = false)
     private Role role;
-
+    @Column(name = "password")
     private String password;
+    @Column(name = "username")
     private String username;
-    private String fullName;
+    @Column(name = "fullname")
+    private String fullname;
+    @Column(name = "email")
     private String email;
+    @Column(name = "phone", unique = true)
     private String phone;
+    @Column(name = "description")
     private String description;
+    @Column(name = "level")
     private Integer level = 1;
-    private Boolean status;
+    @Column(name = "status")
+    private Boolean status = true;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

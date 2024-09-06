@@ -1,4 +1,3 @@
-
 server:
   port: 8080
 
@@ -8,6 +7,7 @@ spring:
     username: sa
     password: 12345678
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
   servlet:
     multipart:
       max-file-size: 10MB
@@ -16,16 +16,20 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # Thay đổi thành validate nếu bạn không muốn Hibernate tạo hoặc cập nhật schema
     properties:
       hibernate:
-        format_sql: true
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyNoOpImpl  # Giữ nguyên tên bảng và cột không thay đổi
+          implicit-naming-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl  # Giữ nguyên tên bảng và cột không thay đổi
     show-sql: true
     open-in-view: true
+
   mvc:
     converters:
       preferred-json-mapper: jackson
+
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 3600 # in second
+  valid-duration: 3600 # in seconds
   refreshable-duration: 36000 # in seconds
