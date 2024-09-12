@@ -62,6 +62,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
+                .role(user.getRole())
+                .userId(user.getUserId())
                 .build();
     }
     private String generateToken(String phone) throws KeyLengthException {
@@ -82,7 +84,7 @@ public class AuthenticationService {
         JWSObject jwsObject = new JWSObject(header,payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes())); // ki token
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("cannot create token", e);
@@ -93,12 +95,18 @@ public class AuthenticationService {
     public IntrospectResponse introspectToken(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
         boolean isValid = true;
+        Integer userId = null;
+
         try{
-            verifyToken(token,false);
+            SignedJWT signedJWT = verifyToken(token,false);
+            userId = Integer.parseInt(signedJWT.getJWTClaimsSet().getSubject());
         } catch (AppException e){
             isValid = false;
         }
-        return IntrospectResponse.builder().valid(isValid).build();
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .userId(userId)
+                .build();
     }
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
 
