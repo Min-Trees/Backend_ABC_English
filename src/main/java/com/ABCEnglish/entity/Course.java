@@ -14,8 +14,11 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer courseId;
     @OneToOne
-    @JoinColumn(name = "userId")
-    private User userId;
+    @JoinColumn(name = "creater")
+    private User creater;
+    @OneToOne
+    @JoinColumn(name = "teacher")
+    private User teacherId;
     private String name;
     private String description;
     private String image;

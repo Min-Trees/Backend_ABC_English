@@ -14,6 +14,7 @@ import java.util.Date;
 public class CourseResponse {
     Integer courseId;
     User teacherId;
+    User creater;
     String name;
     String description;
     String image;

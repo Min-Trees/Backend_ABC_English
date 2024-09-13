@@ -10,8 +10,9 @@ import java.util.Date;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CourseRegister {
+public class CourseRequest {
     User teacherId;
+    User creater;
     String name;
     String description;
     String image;

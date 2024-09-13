@@ -71,7 +71,7 @@ public class AuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(phone) // dai dien user dang nhap
+                .subject(phone)
                 .issuer("Abc_english")
                 .issueTime(new Date())
                 .expirationTime(new Date(
