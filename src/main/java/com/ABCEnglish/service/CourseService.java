@@ -31,28 +31,59 @@ public class CourseService {
     private final UserRepository userRepository;
 
     public CourseResponse createCourse(CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+        // Lấy userId từ token
         Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user =  userRepository.findById(userId)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        System.out.println(authenticationService.introspectToken(token).getUserId());
+
+        // Kiểm tra người dùng tồn tại
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        System.out.println(userRepository.findById(userId));
+        // Ánh xạ từ CourseRequest sang Course
         Course course = courseMapper.toCourse(request);
+        course.setCreator(user);
+        // Tìm người dùng từ ID và gán vào Course
+
+        if (request.getTeacher() != null) {
+            User teacher = userRepository.findById(request.getTeacher().getUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            System.out.println("Teacher found: " + teacher);
+            course.setTeacher(teacher);
+        }
+        // Lưu đối tượng Course vào cơ sở dữ liệu
         courseRepository.save(course);
+        // Trả về đối tượng CourseResponse
         return courseMapper.courseResponse(course);
     }
 
     public CourseResponse updateCourse(Integer courseId,CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+        // lay userId tu token duoc giai ma
         Integer userId = authenticationService.introspectToken(token).getUserId();
+        // kiem tra xem user co ton tai hay khong
         User user =  userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Course course = courseRepository.findUserCreate(courseId, userId)
+        // kiem tra xem nguoi tao co phai nguoi sua khong
+        Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        courseMapper.updatedCourse(request,course);
-        Course updateCourse = courseRepository.save(course);
 
+        courseMapper.updatedCourse(request,course);
+        // cap nhat nguoi tao
+        course.setCreator(user);
+        if (request.getTeacher() != null) {
+            User teacher = userRepository.findById(request.getTeacher().getUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            // cap nhat giao vien
+            course.setTeacher(teacher);
+        }
+
+        Course updateCourse = courseRepository.save(course);
+        // tra ve theo dinh dang courseResponse
         return courseMapper.courseResponse(updateCourse);
     }
 
     public Page<CourseResponse> getAllCourse(Pageable pageable){
-        Page<Course> courses = courseRepository.findByAll(pageable);
+        // thuc hien phan trang
+        Page<Course> courses = courseRepository.findAllBy(pageable);
         return courses.map(courseMapper::courseResponse);
     }
 
@@ -60,7 +91,7 @@ public class CourseService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Course course = courseRepository.findUserCreate(courseId, userId)
+        Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         courseRepository.delete(course);
@@ -68,7 +99,6 @@ public class CourseService {
         courseDeleteResponse.setCourseId(courseId);
         courseDeleteResponse.setStatus(false);
         courseDeleteResponse.setMessage("delete success");
-
         return ApiResponse.<CourseDeleteResponse>builder().result(courseDeleteResponse).build().getResult();
     }
 

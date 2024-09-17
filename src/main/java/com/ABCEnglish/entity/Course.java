@@ -13,12 +13,13 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer courseId;
-    @OneToOne
-    @JoinColumn(name = "creater")
-    private User creater;
-    @OneToOne
-    @JoinColumn(name = "teacher")
-    private User teacherId;
+    @ManyToOne
+    @JoinColumn(name = "creatorId")
+    private User creator;  // Thay vì Integer creatorId
+
+    @ManyToOne
+    @JoinColumn(name = "teacherId")
+    private User teacher;
     private String name;
     private String description;
     private String image;

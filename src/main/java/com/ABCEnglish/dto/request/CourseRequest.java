@@ -11,8 +11,7 @@ import java.util.Date;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseRequest {
-    User teacherId;
-    User creater;
+    User teacher;  // ID của người dạy
     String name;
     String description;
     String image;

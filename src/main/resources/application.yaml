@@ -28,7 +28,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop  # Thay đổi thành validate nếu bạn không muốn Hibernate tạo hoặc cập nhật schema
+      ddl-auto: update  # Thay đổi thành validate nếu bạn không muốn Hibernate tạo hoặc cập nhật schema
     properties:
       hibernate:
         naming:

@@ -13,8 +13,8 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CourseResponse {
     Integer courseId;
-    User teacherId;
-    User creater;
+    Integer creator;
+    Integer teacher;
     String name;
     String description;
     String image;

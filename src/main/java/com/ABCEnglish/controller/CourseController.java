@@ -43,7 +43,9 @@ public class CourseController {
             @RequestBody CourseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
             ) throws ParseException, JOSEException {
+        //Kiem tra token
         String token = authorizationHeader.substring("Bearer".length());
+        // tao token moi
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
         CourseResponse result = courseService.updateCourse(courseId,request,introspectRequest);

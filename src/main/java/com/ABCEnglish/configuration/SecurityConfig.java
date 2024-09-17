@@ -23,8 +23,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/verify").permitAll()// Cho phép không xác thực cho endpoint này
-                        .anyRequest().authenticated() // Các yêu cầu khác yêu cầu xác thực
+                        .requestMatchers("/api/v1/verify").permitAll()
+                        .requestMatchers("/api/v1/auth/token").permitAll()
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/course/add").permitAll()
+                        .requestMatchers("/api/v1/course/updated/**").permitAll()// Cho phép không xác thực cho endpoint này
+                        .anyRequest().permitAll() // Các yêu cầu khác yêu cầu xác thực
                 );
         return http.build();
     }

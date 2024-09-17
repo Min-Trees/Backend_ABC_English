@@ -50,15 +50,13 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws KeyLengthException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        System.out.println(request.getPhone());
-        System.out.println(userRepository.findByPhone(request.getPhone()));
         var user = userRepository
                 .findByPhone(request.getPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean authenticate = passwordEncoder.matches(request.getPassword(),user.getPassword());
-        if(!authenticate)
+        boolean authenticate = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!authenticate)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        var token = generateToken(request.getPhone());
+        var token = generateToken(Integer.valueOf(String.valueOf(user.getUserId())));  // Truyền userId vào generateToken
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
@@ -66,22 +64,21 @@ public class AuthenticationService {
                 .userId(user.getUserId())
                 .build();
     }
-    private String generateToken(String phone) throws KeyLengthException {
-
+    private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(phone)
+                .subject(userId.toString())  // Sử dụng userId làm subject
                 .issuer("Abc_english")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("customClaim","custom")
+                .claim("customClaim", "custom")
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(header,payload);
+        JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
@@ -92,6 +89,7 @@ public class AuthenticationService {
         }
     }
 
+
     public IntrospectResponse introspectToken(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
         boolean isValid = true;
@@ -100,6 +98,7 @@ public class AuthenticationService {
         try{
             SignedJWT signedJWT = verifyToken(token,false);
             userId = Integer.parseInt(signedJWT.getJWTClaimsSet().getSubject());
+            System.out.println("Extracted UserID from Token: " + userId);
         } catch (AppException e){
             isValid = false;
         }
