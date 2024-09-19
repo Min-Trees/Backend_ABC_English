@@ -25,7 +25,7 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseController {
     CourseService courseService;
-    @PostMapping("/add")
+    @PostMapping("")
     public ApiResponse<CourseResponse> addCourse(
             @RequestBody CourseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
@@ -37,7 +37,7 @@ public class CourseController {
         CourseResponse result = courseService.createCourse(request,introspectRequest);
         return ApiResponse.<CourseResponse>builder().result(result).build();
     }
-    @PutMapping("/update/{courseId}")
+    @PutMapping("/{courseId}")
     public ApiResponse<CourseResponse> updateCourse(
             @PathVariable Integer courseId,
             @RequestBody CourseRequest request,
@@ -59,7 +59,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{courseId}")
-    public CourseDeleteResponse deleteResponse(
+    public CourseDeleteResponse deleteCourseResponse(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable Integer courseId) throws ParseException, JOSEException {
         String token = authorizationHeader.substring("Bearer".length());
