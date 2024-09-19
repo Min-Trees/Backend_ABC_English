@@ -29,8 +29,16 @@ public class Lesson {
     @JoinColumn(name = "courseId", nullable = false)
     private Course course;
 
+    @ManyToOne
+    @JoinColumn(name = "creatorId", nullable = false)
+    private User creator;
+
     @Column(name = "lesson_index")
     private Integer lessonIndex;
+
+    private String name;
+    private String content;
+    private Boolean status;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,7 +48,4 @@ public class Lesson {
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date updatedAt;
 
-    private String name;
-    private String content;
-    private Boolean status;
 }

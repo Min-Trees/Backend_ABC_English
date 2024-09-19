@@ -27,6 +27,12 @@ public class Exercises {
     @ManyToOne
     @JoinColumn(name = "courseId", nullable = false)
     private Course course;
+    @ManyToOne
+    @JoinColumn(name = "lessonId", nullable = false)
+    private Lesson lesson;
+    @ManyToOne
+    @JoinColumn(name = "creatorId")
+    private User user;
 
     private String title;
     private String content;
