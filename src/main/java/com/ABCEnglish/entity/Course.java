@@ -49,6 +49,6 @@ public class Course {
     private java.util.Date updatedAt;
 
     public enum CourseType {
-        ILETS, TOEIC
+        IELTS, TOEIC
     }
 }
