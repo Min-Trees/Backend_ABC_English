@@ -32,7 +32,7 @@ public class User {
     @Column(name = "level")
     private Integer level = 1;
     @Column(name = "status")
-    private Boolean status = true;
+    private Boolean status = false;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

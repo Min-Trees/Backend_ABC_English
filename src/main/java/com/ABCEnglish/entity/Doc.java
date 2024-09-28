@@ -1,20 +1,8 @@
 package com.ABCEnglish.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "Documents")
@@ -29,7 +17,9 @@ public class Doc {
     @ManyToOne
     @JoinColumn(name = "courseId", nullable = false)
     private Course course;
-
+    @ManyToOne
+    @JoinColumn(name = "creatorId")
+    private User creator;
     private String name;
     private String description;
     private String url;
@@ -54,6 +44,7 @@ public class Doc {
     private java.util.Date updatedAt;
 
     public enum DocType {
-        PDF, DOCX
+        DOCX, PDF, VIDEO
+
     }
 }

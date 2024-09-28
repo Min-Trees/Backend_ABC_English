@@ -1,18 +1,8 @@
 package com.ABCEnglish.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
 
 @Entity
 @Table(name = "Course")
@@ -23,11 +13,16 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer courseId;
+    @ManyToOne
+    @JoinColumn(name = "creatorId")
+    private User creator;  // Thay vì Integer creatorId
 
-    private Integer teacherId;
+    @ManyToOne
+    @JoinColumn(name = "teacherId")
+    private User teacher;
     private String name;
     private String description;
-    private String images;
+    private String image;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
@@ -54,6 +49,6 @@ public class Course {
     private java.util.Date updatedAt;
 
     public enum CourseType {
-        ILETS, TOEIC
+        IELTS, TOEIC
     }
 }
