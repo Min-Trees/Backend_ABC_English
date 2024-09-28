@@ -2,6 +2,7 @@ package com.ABCEnglish.controller;
 
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.RegisterRequest;
+import com.ABCEnglish.dto.request.StatusRequest;
 import com.ABCEnglish.dto.response.UserResponse;
 import com.ABCEnglish.service.UserService;
 import jakarta.mail.MessagingException;
@@ -10,10 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;  // Import để sử dụng @Slf4j
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -40,5 +38,14 @@ public class UserController {
             log.error("Unexpected error occurred", e);
             throw new RuntimeException("Unexpected error occurred", e);
         }
+    }
+
+    @PostMapping("/{userId}/verifi")
+    public Boolean updateStatus(
+            @PathVariable Integer userId,
+            @RequestBody StatusRequest request
+            ){
+        userService.updateStatus(userId,request);
+        return true;
     }
 }

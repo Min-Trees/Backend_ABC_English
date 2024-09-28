@@ -1,11 +1,14 @@
 package com.ABCEnglish.service;
 
 import com.ABCEnglish.dto.request.RegisterRequest;
+import com.ABCEnglish.dto.request.StatusRequest;
 import com.ABCEnglish.dto.response.UserResponse;
 import com.ABCEnglish.entity.Role;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.entity.VerifiTokenEntity;
 import com.ABCEnglish.entity.VerificationToken;
+import com.ABCEnglish.exceptioin.AppException;
+import com.ABCEnglish.exceptioin.ErrorCode;
 import com.ABCEnglish.mapper.UserMapper;
 import com.ABCEnglish.reponsesitory.RoleRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
@@ -28,10 +31,10 @@ public class UserService {
     private final VerificationTokenRepository verificationTokenRepository;
     public UserResponse createUser(RegisterRequest request) throws MessagingException {
 
-        Role role = roleRepository.findByName("student")
+        Role role = roleRepository.findByName("guest")
                 .orElseGet(()-> {
                     Role newRole = new Role();
-                    newRole.setName("student");
+                    newRole.setName("guest");
                     return roleRepository.save(newRole);
                 });
         User user = userMapper.toUser(request);
@@ -41,9 +44,20 @@ public class UserService {
 
         String token = VerificationToken.generateToken();
         VerifiTokenEntity verifiTokenEntity = new VerifiTokenEntity(user,token);
-        emailService.sendVerificationEmail(user.getEmail(), token);
         verificationTokenRepository.save(verifiTokenEntity);
+        String verificationCode = emailService.sendVerificationCode(user.getEmail());
         System.out.println(token);
-        return userMapper.toUserResponse(user);
+        UserResponse userResponse =  userMapper.toUserResponse(user);
+        userResponse.setCode(verificationCode);
+        return userResponse;
     }
+
+    public Boolean updateStatus(Integer userId,StatusRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
+        user.setStatus(true);
+        userRepository.save(user);
+        return true;
+    }
+
 }

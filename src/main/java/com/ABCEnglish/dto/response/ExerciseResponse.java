@@ -14,8 +14,8 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ExerciseResponse {
     Integer exerciseId;
-    Course course;
-    User user;
+    String lesson;
+    Integer creator;
     String title;
     String content;
     Date createdAt;

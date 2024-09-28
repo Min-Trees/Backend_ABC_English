@@ -20,7 +20,6 @@ public class UserResponse {
     String email;
     String phone;
     String description;
-//    String password;
-//    Integer level ;
+    String code;
     Boolean status;
 }

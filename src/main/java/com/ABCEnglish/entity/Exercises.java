@@ -25,14 +25,11 @@ public class Exercises {
     private Integer exerciseId;
 
     @ManyToOne
-    @JoinColumn(name = "courseId", nullable = false)
-    private Course course;
-    @ManyToOne
     @JoinColumn(name = "lessonId", nullable = false)
     private Lesson lesson;
     @ManyToOne
     @JoinColumn(name = "creatorId")
-    private User user;
+    private User creator;
 
     private String title;
     private String content;
