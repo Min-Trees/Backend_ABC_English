@@ -18,7 +18,9 @@ public enum ErrorCode {
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(1005, "Course not found",HttpStatus.NOT_FOUND),
     DOC_NOT_FOUND(1005, "Doc not found",HttpStatus.NOT_FOUND),
-    LESSON_NOT_FOUND(1005, "Lesson not found",HttpStatus.NOT_FOUND)
+    LESSON_NOT_FOUND(1005, "Lesson not found",HttpStatus.NOT_FOUND),
+    EXERCISE_NOT_FOUND(1005, "exercise not found",HttpStatus.NOT_FOUND),
+
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
