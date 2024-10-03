@@ -17,7 +17,7 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem1;encrypt=true;trustServerCertificate=true
     username: sa
-    password: 123456
+    password: 12345678
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   servlet:
@@ -28,7 +28,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         naming:

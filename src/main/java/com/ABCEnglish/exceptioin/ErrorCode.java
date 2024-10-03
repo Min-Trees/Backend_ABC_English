@@ -20,6 +20,7 @@ public enum ErrorCode {
     DOC_NOT_FOUND(1005, "Doc not found",HttpStatus.NOT_FOUND),
     LESSON_NOT_FOUND(1005, "Lesson not found",HttpStatus.NOT_FOUND),
     EXERCISE_NOT_FOUND(1005, "exercise not found",HttpStatus.NOT_FOUND),
+    TEST_NOT_FOUND(1005, "test not found",HttpStatus.NOT_FOUND),
 
     ;
 
