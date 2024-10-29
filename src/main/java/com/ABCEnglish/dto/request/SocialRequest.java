@@ -15,6 +15,7 @@ import java.util.Set;
 public class SocialRequest {
      User user;
      String content;
+     String title;
      Set<String> images;
      Date createdAt;
      Date updatedAt;

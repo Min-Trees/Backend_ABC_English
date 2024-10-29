@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +30,11 @@ public class AnswerController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
 
         String token = authorizationHeader.substring("Bearer".length());
+        System.out.println(token);
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
         AnswerMChoiceResponse result = answerMChoiceService.createAnswerMChoice(questionId, request, introspectRequest);
         return ApiResponse.<AnswerMChoiceResponse>builder().result(result).build();
-
     }
 
     @PutMapping("/{questionId}/{answerId}")

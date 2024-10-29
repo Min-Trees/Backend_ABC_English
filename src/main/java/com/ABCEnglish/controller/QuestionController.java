@@ -68,5 +68,4 @@ public class QuestionController {
         introspectRequest.setToken(token);
         return questionService.deleteQuestion(exerciseId,questionId,introspectRequest);
     }
-
 }

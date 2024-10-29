@@ -10,8 +10,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface QuestionMapper {
     Question toQuestion(QuestionRequest request);
-    @Mapping(source = "creator.userId", target = "creator")
-    @Mapping(source = "exercise.exerciseId", target = "exercise")
+    @Mapping(source = "creator.userId", target = "creatorId")
+    @Mapping(source = "exercise.exerciseId", target = "exerciseId")
     QuestionResponse questionResponse(Question question);
     void updateQuestion(QuestionRequest request, @MappingTarget Question question);
 }

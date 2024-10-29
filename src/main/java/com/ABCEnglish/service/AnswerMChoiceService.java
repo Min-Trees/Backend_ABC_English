@@ -20,6 +20,7 @@ import com.ABCEnglish.reponsesitory.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,18 @@ import java.text.ParseException;
 @RequiredArgsConstructor
 @Slf4j
 public class AnswerMChoiceService {
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     QuestionRepository questionRepository;
+    @Autowired
     AnswerMChoiceRepository answerMChoiceRepository;
+    @Autowired
     AnswerMChoiceMapper answerMap;
+    @Autowired
     AuthenticationService authenticationService;
 
     public AnswerMChoiceResponse createAnswerMChoice(Integer questionId, AnswerMChoiceRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 public class AnswerMChoiceResponse {
     Integer answerId;
-    Question question;
-     String content;
-     User userId;
-     Boolean isCorrect;
-     Boolean status;
+    Integer questionId;
+    String content;
+    Integer userId;
+    Boolean isCorrect;
+    Boolean status;
 }

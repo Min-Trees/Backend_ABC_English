@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class SocialResponse {
     Integer socialId;
-    User user;
+    Integer userId;
     String title;
     String content;
     Set<String> images;

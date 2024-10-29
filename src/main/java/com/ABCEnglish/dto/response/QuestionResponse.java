@@ -14,8 +14,8 @@ import lombok.experimental.FieldDefaults;
 
 public class QuestionResponse {
     Integer questionId;
-    Exercises exercise;
-    User creator;
+    Integer exerciseId;
+    Integer creatorId;
     String text;
     Boolean status;
     java.math.BigDecimal score;

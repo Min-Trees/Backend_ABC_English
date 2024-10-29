@@ -10,8 +10,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface AnswerMChoiceMapper {
     AnswerMChoice toAnswerMchoice(AnswerMChoiceRequest request);
-    @Mapping(source = "question.questionId", target = "question")
-    @Mapping(source = "user.userId", target = "user")
+    @Mapping(source = "question.questionId", target = "questionId")
+    @Mapping(source = "user.userId", target = "userId")
     AnswerMChoiceResponse answerMChoiceResponse(AnswerMChoice answerMChoice);
 
     void updateAnswerMChoice(AnswerMChoiceRequest request, @MappingTarget AnswerMChoice answerMChoice);
