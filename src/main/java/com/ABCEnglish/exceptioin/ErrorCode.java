@@ -16,7 +16,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(1005,"Role not found", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
-    INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(1005, "Course not found",HttpStatus.NOT_FOUND),
     DOC_NOT_FOUND(1005, "Doc not found",HttpStatus.NOT_FOUND),
     LESSON_NOT_FOUND(1005, "Lesson not found",HttpStatus.NOT_FOUND),
@@ -24,7 +24,7 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND(1005, "question not found",HttpStatus.NOT_FOUND),
     ANSWER_M_CHOICE_NOT_FOUND(1005, "answer not found",HttpStatus.NOT_FOUND),
     FORBIDDEN(1004, "forbidden",HttpStatus.FORBIDDEN),
-    SOCIAL_NOT_FOUND(1005, "social not found",HttpStatus.NOT_FOUND
+    SOCIAL_NOT_FOUND(1005, "social not found",HttpStatus.NOT_FOUND),
 
     ;
 
