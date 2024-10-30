@@ -1,23 +1,27 @@
 package com.ABCEnglish.service;
 
+import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.RegisterRequest;
 import com.ABCEnglish.dto.request.StatusRequest;
 import com.ABCEnglish.dto.response.UserResponse;
-import com.ABCEnglish.entity.Role;
-import com.ABCEnglish.entity.User;
-import com.ABCEnglish.entity.VerifiTokenEntity;
-import com.ABCEnglish.entity.VerificationToken;
+import com.ABCEnglish.entity.*;
 import com.ABCEnglish.exceptioin.AppException;
 import com.ABCEnglish.exceptioin.ErrorCode;
 import com.ABCEnglish.mapper.UserMapper;
 import com.ABCEnglish.reponsesitory.RoleRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
 import com.ABCEnglish.reponsesitory.VerificationTokenRepository;
+import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final MailService emailService;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final AuthenticationService authenticationService;
     public UserResponse createUser(RegisterRequest request) throws MessagingException {
 
         Role role = roleRepository.findByName("guest")
@@ -59,5 +64,27 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+
+    public UserResponse getUser(IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        // kiem tra su ton tai cua user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
+    }
+
+    public Page<UserResponse> getAllUsers(Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Role roleAdmin = roleRepository.findByName("Admin")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        if (user.getRole().getName().equals(roleAdmin.getName())) {
+            Page<User> users = userRepository.findAll(pageable);
+            return users.map(userMapper::toUserResponse);
+        }
+        throw new AppException(ErrorCode.FORBIDDEN);
+    }
+
 
 }

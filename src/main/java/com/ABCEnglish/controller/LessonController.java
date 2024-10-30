@@ -1,11 +1,8 @@
 package com.ABCEnglish.controller;
 
 import com.ABCEnglish.dto.request.ApiResponse;
-import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.LessonRequest;
-import com.ABCEnglish.dto.response.DocDeleteResponse;
-import com.ABCEnglish.dto.response.DocResponse;
 import com.ABCEnglish.dto.response.LessonDeleteResponse;
 import com.ABCEnglish.dto.response.LessonResponse;
 import com.ABCEnglish.service.LessonService;

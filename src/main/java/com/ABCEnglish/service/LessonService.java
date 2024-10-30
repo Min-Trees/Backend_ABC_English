@@ -74,6 +74,18 @@ public class LessonService {
         return lessons.map(lessonMapper::lessonResponse);
     }
 
+    public LessonResponse getLesson(Integer courseId, Integer lessonId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        // kiem tra su ton tai cua user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+        return lessonMapper.lessonResponse(lesson);
+    }
     public LessonDeleteResponse deleteLesson(Integer courseId, Integer lessonId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         // kiem tra su ton tai cua user
