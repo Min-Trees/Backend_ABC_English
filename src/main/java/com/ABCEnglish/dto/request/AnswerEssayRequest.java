@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnswerEssayRequest {
-    Integer question;
-    String userEssay;
     Boolean isCorrect;
+    String content;
+    Boolean status;
 }

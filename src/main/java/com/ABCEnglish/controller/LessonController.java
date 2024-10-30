@@ -60,6 +60,19 @@ public class LessonController {
         Page<LessonResponse> lessonResponses = lessonService.getAllLesson(pageable);
         return ResponseEntity.ok(lessonResponses);
     }
+    @GetMapping("/{courseId}/{lessonId}")
+    public ApiResponse<LessonResponse> getLesson(
+            @PathVariable Integer courseId,
+            @PathVariable Integer lessonId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+
+        LessonResponse result = lessonService.getLesson(courseId,lessonId,introspectRequest);
+        return ApiResponse.<LessonResponse>builder().result(result).build();
+    }
+
 
     @DeleteMapping("/{courseId}/{lessonId}")
     public LessonDeleteResponse deleteLessonResponse(

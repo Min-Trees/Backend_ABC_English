@@ -1,9 +1,12 @@
 package com.ABCEnglish.controller;
+import com.ABCEnglish.dto.request.AnswerEssayRequest;
 import com.ABCEnglish.dto.request.AnswerMChoiceRequest;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.IntrospectRequest;
+import com.ABCEnglish.dto.response.AnswerEssayResponse;
 import com.ABCEnglish.dto.response.AnswerMChoiceDeleteResponse;
 import com.ABCEnglish.dto.response.AnswerMChoiceResponse;
+import com.ABCEnglish.service.AnswerEssayService;
 import com.ABCEnglish.service.AnswerMChoiceService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 @Slf4j
@@ -23,6 +27,7 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerController {
     AnswerMChoiceService answerMChoiceService;
+    AnswerEssayService answerEssayService;
     @PostMapping("/{questionId}")
     public ApiResponse<AnswerMChoiceResponse> addAnswerMChoice(
             @RequestBody AnswerMChoiceRequest request,
@@ -77,5 +82,15 @@ public class AnswerController {
         return answerMChoiceService.deleteAnswerMChoiceResponse(questionId,answerId,introspectRequest);
     }
 
+    @PostMapping("/{questionId}/submit")
+    public AnswerEssayResponse submitAnswer(
+            @PathVariable Integer questionId,
+            @RequestBody AnswerEssayRequest request,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, IOException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        return answerEssayService.createAnswerEssay(questionId, request, introspectRequest);
+    }
 }
 

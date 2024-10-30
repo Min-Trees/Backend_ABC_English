@@ -1,17 +1,28 @@
 package com.ABCEnglish.controller;
 
 import com.ABCEnglish.dto.request.ApiResponse;
+import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.RegisterRequest;
 import com.ABCEnglish.dto.request.StatusRequest;
+import com.ABCEnglish.dto.response.SocialResponse;
 import com.ABCEnglish.dto.response.UserResponse;
+import com.ABCEnglish.entity.User;
 import com.ABCEnglish.service.UserService;
+import com.google.protobuf.Api;
+import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;  // Import để sử dụng @Slf4j
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @Slf4j
 @RestController
@@ -20,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-
     @PostMapping()
     public ApiResponse<UserResponse> createUser(@RequestBody @Valid RegisterRequest request) throws MessagingException {
         log.info("Received request to register user: {}", request);
@@ -47,5 +57,22 @@ public class UserController {
             ){
         userService.updateStatus(userId,request);
         return true;
+    }
+    @GetMapping("/profile")
+    public ApiResponse<UserResponse> getUser(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        UserResponse result = userService.getUser(introspectRequest);
+        return ApiResponse.<UserResponse>builder().result(result).build();
+    }
+    @GetMapping("/admin/users")
+    public ResponseEntity<Page<UserResponse>> getAllSocial(Pageable pageable, @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        Page<UserResponse> result = userService.getAllUsers(pageable,introspectRequest);
+        return ResponseEntity.ok(result);
     }
 }
