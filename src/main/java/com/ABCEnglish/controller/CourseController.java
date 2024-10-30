@@ -58,6 +58,18 @@ public class CourseController {
         return ResponseEntity.ok(courseResponses);
     }
 
+    @GetMapping("/{courseId}")
+    public ApiResponse<CourseResponse> getCourse(
+            @PathVariable Integer courseId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        // tao token moi
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        CourseResponse result = courseService.getCourse(courseId,introspectRequest);
+        return ApiResponse.<CourseResponse>builder().result(result).build();
+    }
+
     @DeleteMapping("/{courseId}")
     public CourseDeleteResponse deleteCourseResponse(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
