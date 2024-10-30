@@ -15,7 +15,7 @@ spring:
             enable: true
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem1;encrypt=true;trustServerCertificate=true
     username: sa
     password: 12345678
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

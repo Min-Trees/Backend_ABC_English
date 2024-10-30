@@ -13,4 +13,5 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     Optional<Course> findByCourseIdAndCreator(Integer courseId, User creator);
 
     Page<Course> findAllBy(Pageable pageable);
+    Optional<Course> findByCourseId(Integer courseId);
 }
