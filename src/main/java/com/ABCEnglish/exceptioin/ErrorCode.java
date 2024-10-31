@@ -25,6 +25,8 @@ public enum ErrorCode {
     ANSWER_M_CHOICE_NOT_FOUND(1005, "answer not found",HttpStatus.NOT_FOUND),
     FORBIDDEN(1004, "forbidden",HttpStatus.FORBIDDEN),
     SOCIAL_NOT_FOUND(1005, "social not found",HttpStatus.NOT_FOUND),
+    TEST_NOT_FOUND(1005, "test not found",HttpStatus.NOT_FOUND),
+
 
     ;
 
