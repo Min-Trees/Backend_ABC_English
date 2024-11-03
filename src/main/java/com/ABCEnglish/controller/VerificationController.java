@@ -7,6 +7,7 @@ import com.ABCEnglish.reponsesitory.UserRepository;
 import com.ABCEnglish.reponsesitory.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,9 +21,10 @@ public class VerificationController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/api/v1/verify")
-    public String verifyEmail(@RequestParam("token") String token) {
-        VerifiTokenEntity verificationToken = tokenRepository.findByToken(token);
+    @GetMapping("/api/v1/verify/{token}")
+    public String verifyEmail(@PathVariable("token") String token) {
+        VerifiTokenEntity verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (verificationToken == null || verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             return "Invalid or expired token!";

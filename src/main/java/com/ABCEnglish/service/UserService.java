@@ -50,7 +50,7 @@ public class UserService {
         String token = VerificationToken.generateToken();
         VerifiTokenEntity verifiTokenEntity = new VerifiTokenEntity(user,token);
         verificationTokenRepository.save(verifiTokenEntity);
-        String verificationCode = emailService.sendVerificationCode(user.getEmail());
+        String verificationCode = authenticationService.sendVerificationEmail(user,token);
         System.out.println(token);
         UserResponse userResponse =  userMapper.toUserResponse(user);
         userResponse.setCode(verificationCode);

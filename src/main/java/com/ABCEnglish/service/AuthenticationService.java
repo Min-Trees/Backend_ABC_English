@@ -14,6 +14,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -41,7 +43,7 @@ public class AuthenticationService {
     protected String SIGNER_KEY;
     @Autowired
     UserRepository userRepository;
-
+    MailService mailService;
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
@@ -123,5 +125,22 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
+    }
+    String sendVerificationEmail(User user, String token) throws MessagingException {
+        if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("User or email cannot be null or empty");
+        }
+
+        // URL xác minh email
+        String verificationUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:8080/api/v1/verify/")
+                .path(token)
+                .toUriString();
+
+        // Tạo body của email
+        String subject = "Verify your email address";
+        String body = "Please click the following link to verify your email: " + verificationUrl;
+        mailService.sendEmail(user.getEmail(),subject,body);
+
+        return verificationUrl;
     }
 }
