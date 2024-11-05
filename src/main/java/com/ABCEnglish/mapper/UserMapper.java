@@ -16,6 +16,6 @@ public interface UserMapper {
     default void addCode(@MappingTarget UserResponse userResponse, User user) {
         // Ví dụ: Tạo mã 'code' dựa trên userId
         String code = "USER" + user.getUserId();
-        userResponse.setCode(code);
+        userResponse.setToken(code);
     }
 }

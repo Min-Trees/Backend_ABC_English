@@ -53,7 +53,7 @@ public class UserService {
         String verificationCode = authenticationService.sendVerificationEmail(user,token);
         System.out.println(token);
         UserResponse userResponse =  userMapper.toUserResponse(user);
-        userResponse.setCode(verificationCode);
+        userResponse.setToken(token);
         return userResponse;
     }
 

@@ -32,7 +32,7 @@ public class ResultExercises {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    private String answer;
+    private Double score;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
