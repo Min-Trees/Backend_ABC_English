@@ -24,12 +24,11 @@ public class ResultExerciseController {
     ResultExerciseService resultExerciseService;
     @PostMapping("/{exerciseId}")
     public ResultExerciseResponse createResult(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                                               @PathVariable Integer exerciseId,
-                                               @RequestBody ResultExerciseRequest request) throws ParseException, JOSEException {
+                                               @PathVariable Integer exerciseId) throws ParseException, JOSEException {
         String token =authorizationHeader.substring("Bearer".length());
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
-        ResultExerciseResponse resultExercises = resultExerciseService.createResult(request,exerciseId,introspectRequest);
+        ResultExerciseResponse resultExercises = resultExerciseService.createResult(exerciseId,introspectRequest);
         return ApiResponse.<ResultExerciseResponse>builder().result(resultExercises).build().getResult();
     }
 

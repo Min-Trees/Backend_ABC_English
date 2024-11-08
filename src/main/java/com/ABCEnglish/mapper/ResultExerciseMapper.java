@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ResultExerciseMapper {
-    ResultExercises toResult(ResultExerciseRequest request);
+    ResultExercises toResult(Integer exerciseId);
     @Mapping(source = "exercise.exerciseId", target = "exerciseId")
     @Mapping(source = "user.userId", target = "userId")
     @Mapping(source = "createdAt", target = "createdAt") // Mapping createdAt

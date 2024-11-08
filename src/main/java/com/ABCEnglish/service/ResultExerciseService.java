@@ -49,7 +49,7 @@ public class ResultExerciseService {
     ResultExerciseRepository resultExerciseRepository;
     @Autowired
     ExerciseRepository exerciseRepository;
-    public ResultExerciseResponse createResult(ResultExerciseRequest request, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
+    public ResultExerciseResponse createResult( Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         // Kiểm tra người dùng tồn tại
         User user = userRepository.findById(userId)
@@ -59,7 +59,7 @@ public class ResultExerciseService {
         List<Question> allQuestions = questionRepository.findByExercise_ExerciseId(exerciseId);
         Double totalScore = questionRepository.getTotalScoreByExerciseId(exerciseId);
 
-        ResultExercises result = resultExerciseMapper.toResult(request);
+        ResultExercises result = resultExerciseMapper.toResult(exerciseId);
         result.setScore(totalScore);
         result.setUser(user);
         result.setExercise(exercise);
