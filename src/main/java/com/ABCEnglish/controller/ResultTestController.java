@@ -19,6 +19,27 @@ public class ResultTestController {
     @Autowired
     private ResultTestService resultTestService;
 
+    @GetMapping("")
+    public ApiResponse getAll(){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .message("Success")
+                .result(resultTestService.getALLResultTests())
+                .build();
+        return apiResponse;
+    }
+    @GetMapping("/{id}")
+    public ApiResponse findById(@PathVariable Integer id, @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code(200)
+                .message("success")
+                .result(resultTestService.getResultTestById(id,introspectRequest))
+                .build();
+        return apiResponse;
+    }
     @PostMapping("")
     public ApiResponse create(
             @RequestBody ResultTestRequest resultTestRequest,
@@ -33,15 +54,15 @@ public class ResultTestController {
                 .build();
         return apiResponse;
     }
-    @DeleteMapping("/{testId}")
-    public ApiResponse delete(@PathVariable Integer testId, @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+    @DeleteMapping("/{resultTestId}")
+    public ApiResponse delete(@PathVariable Integer resultTestId, @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
         String token = authorizationHeader.substring("Bearer".length());
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(200)
                 .message("success")
-                .result(resultTestService.delete(testId,introspectRequest))
+                .result(resultTestService.delete(resultTestId,introspectRequest))
                 .build();
         return apiResponse;
     }
