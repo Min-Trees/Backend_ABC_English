@@ -29,11 +29,11 @@ public class CourseController {
     public ApiResponse<CourseResponse> addCourse(
             @RequestBody CourseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
-
             ) throws ParseException, JOSEException {
         String token = authorizationHeader.substring("Bearer".length());
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
+        System.out.println(token);
         CourseResponse result = courseService.createCourse(request,introspectRequest);
         return ApiResponse.<CourseResponse>builder().result(result).build();
     }
