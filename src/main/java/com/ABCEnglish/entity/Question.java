@@ -19,6 +19,10 @@ public class Question {
     @JoinColumn(name = "exerciseId")
     private Exercises exercise;
 
+    @ManyToOne
+    @JoinColumn(name = "creatorId", nullable = false)
+    private User creator;
+
     private String text;
     private java.math.BigDecimal score;
 
@@ -27,6 +31,8 @@ public class Question {
 
     @Enumerated(EnumType.STRING)
     private SkillType skillType;
+
+    private Boolean status;
 
     public enum QuestionType {
         MULTIPLE_CHOICE, ESSAY

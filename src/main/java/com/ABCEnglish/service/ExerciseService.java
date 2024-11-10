@@ -75,6 +75,19 @@ public class ExerciseService {
         return exercise.map(exerciseMapper::exerciseResponse);
     }
 
+    public ExerciseResponse getExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+
+        Exercises exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
+        return exerciseMapper.exerciseResponse(exercise);
+    }
+
     public ExerciseDeleteResponse deleteExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)

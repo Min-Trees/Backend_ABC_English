@@ -58,6 +58,18 @@ public class ExerciseController {
         Page<ExerciseResponse> result = exerciseService.getAllExercise(pageable);
         return ResponseEntity.ok(result);
     }
+    @GetMapping("/{lessonId}/{exerciseId}")
+    ApiResponse<ExerciseResponse> getExercise(
+            @PathVariable Integer lessonId,
+            @PathVariable Integer exerciseId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
+    ) throws ParseException, JOSEException{
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        ExerciseResponse result = exerciseService.getExercise(lessonId,exerciseId,introspectRequest);
+        return ApiResponse.<ExerciseResponse>builder().result(result).build();
+    }
 
     @DeleteMapping("/{lessonId}/{exerciseId}")
     public ExerciseDeleteResponse deleteExercise(

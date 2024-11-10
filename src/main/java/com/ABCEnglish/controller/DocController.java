@@ -59,6 +59,19 @@ public class DocController {
         return ResponseEntity.ok(docResponses);
     }
 
+    @GetMapping("/{courseId}/{docId}")
+    public ApiResponse<DocResponse> getDoc(
+            @PathVariable Integer courseId,
+            @PathVariable Integer docId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
+
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+
+        DocResponse result = docService.getDoc(courseId,docId,introspectRequest);
+        return ApiResponse.<DocResponse>builder().result(result).build();
+    }
     @DeleteMapping("/{courseId}/{docId}")
     public DocDeleteResponse deleteDocResponse(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,

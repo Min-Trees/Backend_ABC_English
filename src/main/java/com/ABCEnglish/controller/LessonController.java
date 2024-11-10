@@ -1,11 +1,8 @@
 package com.ABCEnglish.controller;
 
 import com.ABCEnglish.dto.request.ApiResponse;
-import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.LessonRequest;
-import com.ABCEnglish.dto.response.DocDeleteResponse;
-import com.ABCEnglish.dto.response.DocResponse;
 import com.ABCEnglish.dto.response.LessonDeleteResponse;
 import com.ABCEnglish.dto.response.LessonResponse;
 import com.ABCEnglish.service.LessonService;
@@ -63,6 +60,19 @@ public class LessonController {
         Page<LessonResponse> lessonResponses = lessonService.getAllLesson(pageable);
         return ResponseEntity.ok(lessonResponses);
     }
+    @GetMapping("/{courseId}/{lessonId}")
+    public ApiResponse<LessonResponse> getLesson(
+            @PathVariable Integer courseId,
+            @PathVariable Integer lessonId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+
+        LessonResponse result = lessonService.getLesson(courseId,lessonId,introspectRequest);
+        return ApiResponse.<LessonResponse>builder().result(result).build();
+    }
+
 
     @DeleteMapping("/{courseId}/{lessonId}")
     public LessonDeleteResponse deleteLessonResponse(

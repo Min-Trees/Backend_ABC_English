@@ -17,7 +17,10 @@ public class AnswerEssay {
     @ManyToOne
     @JoinColumn(name = "questionId")
     private Question question;
-
-    private String userEssay;
+    private String content;
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
     private Boolean isCorrect;
+    private Boolean status;
 }

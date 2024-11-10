@@ -81,6 +81,19 @@ public class DocService {
         return docs.map(docMapper::docResponse);
     }
 
+    public DocResponse getDoc(Integer courseId, Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+
+        Doc doc = docRepository.findById(docId)
+                .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
+        return docMapper.docResponse(doc);
+    }
+
     public DocDeleteResponse deleteDoc(Integer courseId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)

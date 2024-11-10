@@ -87,6 +87,15 @@ public class CourseService {
         return courses.map(courseMapper::courseResponse);
     }
 
+    public CourseResponse getCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        return courseMapper.courseResponse(course);
+    }
+
     public CourseDeleteResponse deleteCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
