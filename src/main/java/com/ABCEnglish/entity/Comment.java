@@ -21,7 +21,9 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commentId;
-
+    @ManyToOne
+    @JoinColumn(name = "socialId", nullable = false)
+    private Social social;
     private String content;
 
     @ManyToOne

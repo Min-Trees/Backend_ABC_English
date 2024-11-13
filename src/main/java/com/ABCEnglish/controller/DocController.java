@@ -82,6 +82,5 @@ public class DocController {
         introspectRequest.setToken(token);
         return docService.deleteDoc(courseId,docId, introspectRequest);
     }
-
-
+    
 }
