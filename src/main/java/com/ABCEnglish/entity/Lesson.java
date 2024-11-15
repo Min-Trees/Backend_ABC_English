@@ -35,8 +35,9 @@ public class Lesson {
 
     @Column(name = "lesson_index")
     private Integer lessonIndex;
-
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String name;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String content;
     private Boolean status;
 

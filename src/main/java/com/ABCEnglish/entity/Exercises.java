@@ -30,8 +30,9 @@ public class Exercises {
     @ManyToOne
     @JoinColumn(name = "creatorId")
     private User creator;
-
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String title;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String content;
 
     @Column(name = "created_at", updatable = false)

@@ -5,7 +5,8 @@ import com.ABCEnglish.entity.Doc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface DocRepository extends JpaRepository<Doc, Integer> {
+public interface DocRepository extends JpaRepository<Doc, Integer>, JpaSpecificationExecutor<Doc> {
     Page<Doc> findAllBy(Pageable pageable);
 }

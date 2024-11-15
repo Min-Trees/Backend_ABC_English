@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,8 @@ public class DocService {
         // luu tru nguoi tao tai lieu
         doc.setCreator(user);
         doc.setCourse(course);
+        doc.setCreatedAt(new Date());
+        doc.setUpdatedAt(new Date());
         docRepository.save(doc);
         return docMapper.docResponse(doc);
     }
@@ -70,6 +73,7 @@ public class DocService {
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
 
         docMapper.updateDoc(request,doc);
+        doc.setUpdatedAt(new Date());
         Doc updateDoc = docRepository.save(doc);
         return docMapper.docResponse(updateDoc);
     }

@@ -16,6 +16,7 @@ import com.ABCEnglish.reponsesitory.LessonRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,8 @@ public class ExerciseService {
         Exercises exercises = exerciseMapper.toExercise(request);
         exercises.setCreator(user);
         exercises.setLesson(lesson);
+        exercises.setCreatedAt(new Date());
+        exercises.setUpdatedAt(new Date());
         exerciseRepository.save(exercises);
 
         return exerciseMapper.exerciseResponse(exercises);

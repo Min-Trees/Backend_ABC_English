@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,8 @@ public class CourseService {
             System.out.println("Teacher found: " + teacher);
             course.setTeacher(teacher);
         }
+        course.setCreatedAt(new Date());
+        course.setUpdatedAt(new Date());
         // Lưu đối tượng Course vào cơ sở dữ liệu
         courseRepository.save(course);
         // Trả về đối tượng CourseResponse
@@ -75,7 +78,7 @@ public class CourseService {
             // cap nhat giao vien
             course.setTeacher(teacher);
         }
-
+        course.setUpdatedAt(new Date());
         Course updateCourse = courseRepository.save(course);
         // tra ve theo dinh dang courseResponse
         return courseMapper.courseResponse(updateCourse);

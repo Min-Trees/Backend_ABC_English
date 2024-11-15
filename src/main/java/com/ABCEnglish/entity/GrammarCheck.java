@@ -17,7 +17,7 @@ public class GrammarCheck {
     @ManyToOne
     @JoinColumn(name = "questionId")
     private Question question;
-
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String userText;
     private String correctText;
     private String errorJson;

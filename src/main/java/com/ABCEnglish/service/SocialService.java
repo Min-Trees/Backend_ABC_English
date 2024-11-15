@@ -58,7 +58,7 @@ public class SocialService {
         Social social = socialRepository.findById(socialId)
                 .orElseThrow(() -> new AppException(ErrorCode.SOCIAL_NOT_FOUND));
         socialMapper.updateSocial(request,social);
-
+        social.setUpdatedAt(new Date());
         Social updateSocial = socialRepository.save(social);
         return socialMapper.socialResponse(updateSocial);
     }

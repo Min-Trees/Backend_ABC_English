@@ -22,7 +22,7 @@ public class Question {
     @ManyToOne
     @JoinColumn(name = "creatorId", nullable = false)
     private User creator;
-
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String text;
     private java.math.BigDecimal score;
 

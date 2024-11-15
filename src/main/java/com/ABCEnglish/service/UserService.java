@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -31,7 +32,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final MailService emailService;
     private final VerificationTokenRepository verificationTokenRepository;
     private final AuthenticationService authenticationService;
     public UserResponse createUser(RegisterRequest request) throws MessagingException {
@@ -45,6 +45,8 @@ public class UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(role);
+        user.setCreatedAt(new Date());
+        user.setUpdatedAt(new Date());
         user = userRepository.save(user);
 
         String token = VerificationToken.generateToken();

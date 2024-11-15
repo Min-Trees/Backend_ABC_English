@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 
 @Service
@@ -52,6 +53,8 @@ public class TestService {
 
             test.setCourse(course);
         }
+        test.setCreatedAt(new Date());
+        test.setUpdatedAt(new Date());
         testRepository.save(test);
         return testMapper.testResponse(test);
     }

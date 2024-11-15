@@ -1,34 +1,41 @@
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
     username: npminhtri.be@gmail.com
-    password: cfubhnaxnbdzsnta
+    password: cfubhnaxnbdzsnta  # Lưu ý: Thực tế nên dùng biến môi trường để bảo mật password
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+          ssl:
+            trust: smtp.gmail.com
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true;useUnicode=true;characterEncoding=UTF-8
     username: sa
     password: 12345678
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+    encoding:
+      charset: UTF-8
       enabled: true
+      force: true
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create  # Thay "create" bằng "update" để tránh mất dữ liệu khi khởi động lại
     properties:
       hibernate:
         naming:
@@ -43,5 +50,5 @@ spring:
 
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 3600 # in seconds
-  refreshable-duration: 36000 # in seconds
+  valid-duration: 3600 # thời gian hiệu lực của JWT (giây)
+  refreshable-duration: 36000 # thời gian có thể làm mới JWT (giây)

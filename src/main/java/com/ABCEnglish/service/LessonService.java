@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,8 @@ public class LessonService {
         Lesson lesson = lessonMapper.toLesson(request);
         lesson.setCreator(user);
         lesson.setCourse(course);
-
+        lesson.setCreatedAt(new Date());
+        lesson.setUpdatedAt(new Date());
         lessonRepository.save(lesson);
         return lessonMapper.lessonResponse(lesson);
     }
@@ -64,6 +66,7 @@ public class LessonService {
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
         lessonMapper.updateLesson(request,lesson);
+        lesson.setUpdatedAt(new Date());
         Lesson updateLesson =lessonRepository.save(lesson);
         return lessonMapper.lessonResponse(lesson);
     }

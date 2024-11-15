@@ -20,7 +20,10 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "teacherId")
     private User teacher;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String name;
+
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String description;
     private String image;
 

@@ -90,7 +90,7 @@ public class CommentService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Social social = socialRepository.findById(socialId)
                 .orElseThrow(() -> new AppException((ErrorCode.SOCIAL_NOT_FOUND)));
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findByCommentIdAndUserId(commentId,userId)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND));
         commentRepository.delete(comment);
         CommentDeleteResponse commentDeleteResponse = new CommentDeleteResponse();

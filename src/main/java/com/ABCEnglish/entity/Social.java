@@ -20,7 +20,9 @@ public class Social {
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String title;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String content;
     @ElementCollection
     private Set<String> images;

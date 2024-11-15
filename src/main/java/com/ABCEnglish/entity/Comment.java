@@ -24,6 +24,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "socialId", nullable = false)
     private Social social;
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String content;
 
     @ManyToOne
