@@ -6,6 +6,7 @@ import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.AnswerEssayResponse;
 import com.ABCEnglish.dto.response.AnswerMChoiceDeleteResponse;
 import com.ABCEnglish.dto.response.AnswerMChoiceResponse;
+import com.ABCEnglish.dto.response.QuestionResponse;
 import com.ABCEnglish.service.AnswerEssayService;
 import com.ABCEnglish.service.AnswerMChoiceService;
 import com.nimbusds.jose.JOSEException;
@@ -14,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -69,6 +73,13 @@ public class AnswerController {
         AnswerMChoiceResponse result = answerMChoiceService.getAnswerMChoice(questionId,answerId,introspectRequest);
         return ApiResponse.<AnswerMChoiceResponse>builder().result(result).build();
     }
+
+    @GetMapping("/{questionId}")
+    public ResponseEntity<Page<AnswerMChoiceResponse>> getAllQuestions(Pageable pageable, @PathVariable Integer questionId){
+        Page<AnswerMChoiceResponse> result = answerMChoiceService.getAllAnswersMChoice(pageable, questionId);
+        return ResponseEntity.ok(result);
+    }
+
 
     @DeleteMapping("/{questionId}/{answerId}")
     public AnswerMChoiceDeleteResponse deleteAnswerMChoice(

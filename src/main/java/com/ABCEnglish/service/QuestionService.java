@@ -62,9 +62,9 @@ public class QuestionService {
         questionRepository.save(question);
         return questionMapper.questionResponse(question);
     }
-    public Page<QuestionResponse> getAllQuestion(Pageable pageable){
+    public Page<QuestionResponse> getAllQuestion(Pageable pageable, Integer exerciseId){
         // thuc hien phan trang
-        Page<Question> questions = questionRepository.findAll(pageable);
+        Page<Question> questions = questionRepository.findByExercise_ExerciseId(pageable,exerciseId);
         return questions.map(questionMapper::questionResponse);
     }
 

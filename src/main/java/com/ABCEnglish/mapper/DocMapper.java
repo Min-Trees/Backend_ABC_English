@@ -13,8 +13,8 @@ import org.mapstruct.MappingTarget;
 public interface DocMapper  {
     Doc toDoc(DocRequest request);
     @Mapping(source = "docId", target = "docId") // Mapping docId
-    @Mapping(source = "course.name", target = "course") // Mapping Course name to course
-    @Mapping(source = "creator.userId", target = "creator") // Mapping creator's userId to creator
+    @Mapping(source = "creator.userId", target = "creator")
+    @Mapping(source = "lesson.name", target = "lesson")// Mapping creator's userId to creator
     @Mapping(source = "createdAt", target = "createdAt") // Mapping createdAt
     @Mapping(source = "updatedAt", target = "updatedAt") // Mapping updatedAt
     DocResponse docResponse(Doc doc);

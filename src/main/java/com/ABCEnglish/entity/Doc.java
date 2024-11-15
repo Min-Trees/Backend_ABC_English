@@ -13,10 +13,9 @@ public class Doc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer docId;
-
     @ManyToOne
-    @JoinColumn(name = "courseId", nullable = false)
-    private Course course;
+    @JoinColumn(name = "lessonId", nullable = false)
+    private Lesson lesson;
     @ManyToOne
     @JoinColumn(name = "creatorId")
     private User creator;

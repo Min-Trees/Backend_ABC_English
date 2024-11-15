@@ -9,12 +9,14 @@ import com.ABCEnglish.dto.response.DocDeleteResponse;
 import com.ABCEnglish.dto.response.DocResponse;
 import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.Doc;
+import com.ABCEnglish.entity.Lesson;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exceptioin.AppException;
 import com.ABCEnglish.exceptioin.ErrorCode;
 import com.ABCEnglish.mapper.DocMapper;
 import com.ABCEnglish.reponsesitory.CourseRepository;
 import com.ABCEnglish.reponsesitory.DocRepository;
+import com.ABCEnglish.reponsesitory.LessonRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
@@ -36,38 +38,38 @@ public class DocService {
     DocRepository docRepository;
     UserRepository userRepository;
     AuthenticationService authenticationService;
-    CourseRepository courseRepository;
+    LessonRepository lessonRepository;
     DocMapper docMapper;
 
-    public DocResponse createDoc(Integer courseId,DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+    public DocResponse createDoc(Integer lessonId,DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // lay thong tin user tu token
         Integer userId = authenticationService.introspectToken(token).getUserId();
         // kiem tra su ton tai cua user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
 
         Doc doc = docMapper.toDoc(request);
 
         // luu tru nguoi tao tai lieu
         doc.setCreator(user);
-        doc.setCourse(course);
+        doc.setLesson(lesson);
         doc.setCreatedAt(new Date());
         doc.setUpdatedAt(new Date());
         docRepository.save(doc);
         return docMapper.docResponse(doc);
     }
 
-    public DocResponse updateDoc(Integer courseId, Integer docId, DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+    public DocResponse updateDoc(Integer lessonId, Integer docId, DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
 
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
@@ -85,26 +87,26 @@ public class DocService {
         return docs.map(docMapper::docResponse);
     }
 
-    public DocResponse getDoc(Integer courseId, Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
+    public DocResponse getDoc(Integer lessonId, Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
         return docMapper.docResponse(doc);
     }
 
-    public DocDeleteResponse deleteDoc(Integer courseId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
+    public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));

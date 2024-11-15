@@ -16,7 +16,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DocResponse {
       Integer docId;
-      String course; // Course name, not Course object
+      String lesson;
       Integer creator; // Creator userId
       String name;
       String description;

@@ -69,9 +69,11 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(updateAnswerMChoice);
     }
 
-    public Page<AnswerMChoiceResponse> getAllAnswersMChoice(Pageable pageable){
+    public Page<AnswerMChoiceResponse> getAllAnswersMChoice(Pageable pageable, Integer questionId){
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         // thuc hien phan trang
-        Page<AnswerMChoice> answerMChoices = answerMChoiceRepository.findAll(pageable);
+        Page<AnswerMChoice> answerMChoices = answerMChoiceRepository.findByQuestion_QuestionId(pageable,questionId);
         return answerMChoices.map(answerMap::answerMChoiceResponse);
     }
 
