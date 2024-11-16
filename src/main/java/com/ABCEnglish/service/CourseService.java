@@ -94,7 +94,7 @@ public class CourseService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
+        Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         return courseMapper.courseResponse(course);
     }
