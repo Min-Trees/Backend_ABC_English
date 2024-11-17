@@ -71,9 +71,11 @@ public class LessonService {
         return lessonMapper.lessonResponse(lesson);
     }
 
-    public Page<LessonResponse> getAllLesson(Pageable pageable){
+    public Page<LessonResponse> getAllLesson( Integer courseId,Pageable pageable){
         // thuc hien phan trang
-        Page<Lesson> lessons = lessonRepository.findAll(pageable);
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Page<Lesson> lessons = lessonRepository.findByCourse(course,pageable);
         return lessons.map(lessonMapper::lessonResponse);
     }
 
