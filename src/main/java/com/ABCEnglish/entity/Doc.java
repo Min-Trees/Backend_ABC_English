@@ -21,6 +21,8 @@ public class Doc {
     private User creator;
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String name;
+    @Column(columnDefinition = "NVARCHAR(100)", nullable = false)
+    private String content;
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String description;
     private String url;
