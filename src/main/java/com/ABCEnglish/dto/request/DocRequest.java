@@ -16,6 +16,7 @@ import java.util.Date;
 public class DocRequest {
      String name;
      String description;
+     String content;
      String url;
      String images;
      Doc.DocType type;

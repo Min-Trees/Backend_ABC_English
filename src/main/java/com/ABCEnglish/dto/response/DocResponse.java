@@ -20,6 +20,7 @@ public class DocResponse {
       Integer creator; // Creator userId
       String name;
       String description;
+      String content;
       String url;
       String images;
       String type;
