@@ -78,7 +78,7 @@ public class ExerciseService {
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         // thuc hien phan trang
 
-        Page<Exercises> exercise = exerciseRepository.findByLesson(pageable, lessonId);
+        Page<Exercises> exercise = exerciseRepository.findByLesson(pageable, lesson);
         return exercise.map(exerciseMapper::exerciseResponse);
     }
 
