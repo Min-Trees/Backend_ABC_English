@@ -73,9 +73,12 @@ public class ExerciseService {
         return exerciseMapper.exerciseResponse(updateExercise);
     }
 
-    public Page<ExerciseResponse> getAllExercise(Pageable pageable){
+    public Page<ExerciseResponse> getAllExercise(Pageable pageable, Integer lessonId){
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         // thuc hien phan trang
-        Page<Exercises> exercise = exerciseRepository.findAll(pageable);
+
+        Page<Exercises> exercise = exerciseRepository.findByLesson(pageable, lessonId);
         return exercise.map(exerciseMapper::exerciseResponse);
     }
 

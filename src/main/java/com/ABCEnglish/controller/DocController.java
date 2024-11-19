@@ -53,9 +53,9 @@ public class DocController {
         return ApiResponse.<DocResponse>builder().result(result).build();
     }
 
-    @GetMapping()
-    public ResponseEntity<Page<DocResponse>> getAllDoc(Pageable pageable){
-        Page<DocResponse> docResponses = docService.getAllDoc(pageable);
+    @GetMapping("/{lessonId}")
+    public ResponseEntity<Page<DocResponse>> getAllDoc(Pageable pageable, @PathVariable Integer lessonId){
+        Page<DocResponse> docResponses = docService.getAllDoc(pageable, lessonId);
         return ResponseEntity.ok(docResponses);
     }
 

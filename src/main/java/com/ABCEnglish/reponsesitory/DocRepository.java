@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface DocRepository extends JpaRepository<Doc, Integer>, JpaSpecificationExecutor<Doc> {
     Page<Doc> findAllBy(Pageable pageable);
+    Page<Doc> findByLesson(Pageable pageable, Integer lessonId);
 }

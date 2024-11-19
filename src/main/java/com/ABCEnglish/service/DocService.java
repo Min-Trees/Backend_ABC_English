@@ -81,9 +81,11 @@ public class DocService {
     }
 
 
-    public Page<DocResponse> getAllDoc(Pageable pageable){
+    public Page<DocResponse> getAllDoc(Pageable pageable, Integer lessonId){
         // thuc hien phan trang
-        Page<Doc> docs = docRepository.findAllBy(pageable);
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+        Page<Doc> docs = docRepository.findByLesson(pageable, lessonId);
         return docs.map(docMapper::docResponse);
     }
 
