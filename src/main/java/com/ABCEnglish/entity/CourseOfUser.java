@@ -2,15 +2,9 @@ package com.ABCEnglish.entity;
 
 import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.User;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "Course_Of_User")
@@ -19,18 +13,14 @@ import jakarta.persistence.JoinColumn;
 public class CourseOfUser {
 
     @Id
-    @Column(name = "userId")
-    private Integer userId;
-
-    @Id
-    @Column(name = "courseId")
-    private Integer courseId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer courseOfUserId;
 
     @ManyToOne
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "courseId", insertable = false, updatable = false)
+    @JoinColumn(name = "courseId", nullable = false)
     private Course course;
 }

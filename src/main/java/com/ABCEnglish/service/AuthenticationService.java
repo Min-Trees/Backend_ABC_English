@@ -52,20 +52,30 @@ public class AuthenticationService {
     InvalidatedTokenRepository invalidatedTokenRepository;
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws KeyLengthException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
+        // Tìm người dùng trong cơ sở dữ liệu theo số điện thoại
         var user = userRepository
                 .findByPhone(request.getPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        // Kiểm tra mật khẩu nhập vào có khớp với mật khẩu đã mã hóa trong cơ sở dữ liệu
         boolean authenticate = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!authenticate)
+        if (!authenticate) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-        var token = generateToken(Integer.valueOf(String.valueOf(user.getUserId())));  // Truyền userId vào generateToken
+        }
+
+        // Nếu người dùng đã đăng nhập thành công, tạo token cho người dùng
+        var token = generateToken(user.getUserId());  // Truyền userId vào generateToken
+
+        // Trả về thông tin đăng nhập của người dùng (token, thông tin người dùng...)
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
-                .role(user.getRole())
+                .role(user.getRole()) // Lấy tên vai trò người dùng
                 .userId(user.getUserId())
                 .build();
     }
+
     private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -74,7 +84,7 @@ public class AuthenticationService {
                 .issuer("Abc_english")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("customClaim", "custom")

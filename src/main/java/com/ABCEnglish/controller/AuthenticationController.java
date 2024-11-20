@@ -26,12 +26,13 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) throws KeyLengthException {
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) throws KeyLengthException {
         var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
                 .build();
     }
+
 
     @PostMapping("/token")
     ApiResponse<IntrospectResponse> introspectResponseApiResponse(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {

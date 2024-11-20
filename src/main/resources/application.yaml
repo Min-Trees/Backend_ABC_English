@@ -5,8 +5,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: npminhtri.be@gmail.com
-    password: cfubhnaxnbdzsnta
+    username: npminhtri.be@gmail.com  # Thông tin email
+    password: cfubhnaxnbdzsnta  # Thông tin mật khẩu
     properties:
       mail:
         smtp:
@@ -16,8 +16,8 @@ spring:
 
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true
-    username: sa
-    password: 12345678
+    username: sa  # Tên người dùng CSDL
+    password: 12345678  # Mật khẩu CSDL
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   servlet:
@@ -28,7 +28,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         naming:
@@ -42,6 +42,12 @@ spring:
       preferred-json-mapper: jackson
 
 jwt:
-  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 3600 # in seconds
-  refreshable-duration: 36000 # in seconds
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"  # Khóa ký JWT
+  valid-duration: 3600  # Thời gian hợp lệ của JWT (giây)
+  refreshable-duration: 36000  # Thời gian làm mới JWT (giây)
+
+vnpay:
+  tmn-code: FM2YJ74Z  # Mã TMN của VNPay
+  hash-secret: M2NXGKZG9WNZ0X8HSRX56TFO6XMWCL75  # Bí mật hash của VNPay
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html  # URL VNPay Sandbox
+  return-url: http://localhost:8080/payment/vnpay_return  # URL trả về sau khi thanh toán
