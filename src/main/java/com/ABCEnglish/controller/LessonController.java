@@ -55,9 +55,9 @@ public class LessonController {
         return ApiResponse.<LessonResponse>builder().result(result).build();
     }
 
-    @GetMapping()
-    public ResponseEntity<Page<LessonResponse>> getAllLesson(Pageable pageable){
-        Page<LessonResponse> lessonResponses = lessonService.getAllLesson(pageable);
+    @GetMapping("/{courseId}")
+    public ResponseEntity<Page<LessonResponse>> getAllLesson(Pageable pageable, @PathVariable Integer courseId){
+        Page<LessonResponse> lessonResponses = lessonService.getAllLesson(courseId,pageable);
         return ResponseEntity.ok(lessonResponses);
     }
     @GetMapping("/{courseId}/{lessonId}")

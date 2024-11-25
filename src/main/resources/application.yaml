@@ -22,14 +22,14 @@ spring:
             trust: smtp.gmail.com
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem1;encrypt=true;trustServerCertificate=true;useUnicode=true;characterEncoding=UTF-8
+    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true;useUnicode=true;characterEncoding=UTF-8
     username: sa  # Sử dụng biến môi trường cho username
     password: 12345678  # Sử dụng biến môi trường cho password
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
     hibernate:
-      ddl-auto: update # Tùy chọn có thể là: none, update, create, create-drop
+      ddl-auto: create-drop # Tùy chọn có thể là: none, update, create, create-drop
     properties:
       hibernate:
         naming:

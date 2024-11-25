@@ -3,10 +3,7 @@ package com.ABCEnglish.service;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.response.CourseDeleteResponse;
-import com.ABCEnglish.dto.response.CourseResponse;
-import com.ABCEnglish.dto.response.DocDeleteResponse;
-import com.ABCEnglish.dto.response.DocResponse;
+import com.ABCEnglish.dto.response.*;
 import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.Doc;
 import com.ABCEnglish.entity.Lesson;
@@ -81,9 +78,11 @@ public class DocService {
     }
 
 
-    public Page<DocResponse> getAllDoc(Pageable pageable){
+    public Page<DocResponse> getAllDoc(Pageable pageable, Integer lessonId){
         // thuc hien phan trang
-        Page<Doc> docs = docRepository.findAllBy(pageable);
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+        Page<Doc> docs = docRepository.findByLesson(pageable, lesson);
         return docs.map(docMapper::docResponse);
     }
 
@@ -98,6 +97,12 @@ public class DocService {
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
         return docMapper.docResponse(doc);
+    }
+    public Page<DocResponse> getByLesson(Integer lessonId,Pageable pageable) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+        Page<Doc> docs=docRepository.findAllByLesson(lesson,pageable);
+        return docs.map(docMapper::docResponse);
     }
 
     public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {

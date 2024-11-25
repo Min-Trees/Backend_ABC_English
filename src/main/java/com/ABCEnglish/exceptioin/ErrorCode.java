@@ -27,7 +27,8 @@ public enum ErrorCode {
     SOCIAL_NOT_FOUND(1005, "social not found",HttpStatus.NOT_FOUND),
     TEST_NOT_FOUND(1005, "test not found",HttpStatus.NOT_FOUND),
     COMMENT_NOT_FOUND(1005, "comment not found",HttpStatus.NOT_FOUND),
-
+    UNEXPECTED_ERROR(1006,"Unexpected error data", HttpStatus.BAD_REQUEST ),
+    INVALID_DATE_RANGE(1006,"Error Date", HttpStatus.BAD_REQUEST)
 
     ;
 

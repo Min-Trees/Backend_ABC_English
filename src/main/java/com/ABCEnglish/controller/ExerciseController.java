@@ -53,9 +53,9 @@ public class ExerciseController {
         return ApiResponse.<ExerciseResponse>builder().result(result).build();
     }
 
-    @GetMapping()
-    public ResponseEntity<Page<ExerciseResponse>> getAllExercises(Pageable pageable){
-        Page<ExerciseResponse> result = exerciseService.getAllExercise(pageable);
+    @GetMapping("/{lessonId}")
+    public ResponseEntity<Page<ExerciseResponse>> getAllExercises(Pageable pageable, @PathVariable Integer lessonId){
+        Page<ExerciseResponse> result = exerciseService.getAllExercise(pageable, lessonId);
         return ResponseEntity.ok(result);
     }
     @GetMapping("/{lessonId}/{exerciseId}")
