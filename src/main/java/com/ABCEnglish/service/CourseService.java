@@ -6,10 +6,12 @@ import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.CourseDeleteResponse;
 import com.ABCEnglish.dto.response.CourseResponse;
 import com.ABCEnglish.entity.Course;
+import com.ABCEnglish.entity.CourseOfUser;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exceptioin.AppException;
 import com.ABCEnglish.exceptioin.ErrorCode;
 import com.ABCEnglish.mapper.CourseMapper;
+import com.ABCEnglish.reponsesitory.CourseOfUserRepository;
 import com.ABCEnglish.reponsesitory.CourseRepository;
 import com.ABCEnglish.reponsesitory.UserRepository;
 import com.nimbusds.jose.JOSEException;
@@ -30,6 +32,7 @@ public class CourseService {
     private final CourseMapper courseMapper;
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
+    private final CourseOfUserRepository courseOfUserRepository;
 
     public CourseResponse createCourse(CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // Lấy userId từ token
@@ -113,5 +116,23 @@ public class CourseService {
         courseDeleteResponse.setMessage("delete success");
         return ApiResponse.<CourseDeleteResponse>builder().result(courseDeleteResponse).build().getResult();
     }
+    public Page<CourseResponse> getCoursesByUser(IntrospectRequest token, Pageable pageable) throws ParseException, JOSEException {
+        // Lấy userId từ token
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+
+        // Kiểm tra người dùng có tồn tại hay không
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        // Lấy danh sách các bản ghi CourseOfUser
+        Page<CourseOfUser> courseOfUsers = courseOfUserRepository.findAllByUser(user, pageable);
+
+        // Chuyển đổi danh sách CourseOfUser sang CourseResponse
+        return courseOfUsers.map(courseOfUser ->
+                courseMapper.courseResponse(courseOfUser.getCourse())
+        );
+    }
+
+
 
 }

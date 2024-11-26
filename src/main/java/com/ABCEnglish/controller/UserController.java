@@ -52,7 +52,7 @@ public class UserController {
     public Boolean updateStatus(
             @PathVariable Integer userId,
             @RequestBody StatusRequest request
-            ){
+    ){
         userService.updateStatus(userId,request);
         return true;
     }

@@ -25,7 +25,7 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseController {
     CourseService courseService;
-    @PostMapping("")
+    @PostMapping("/admin")
     public ApiResponse<CourseResponse> addCourse(
             @RequestBody CourseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
@@ -37,7 +37,7 @@ public class CourseController {
         CourseResponse result = courseService.createCourse(request,introspectRequest);
         return ApiResponse.<CourseResponse>builder().result(result).build();
     }
-    @PutMapping("/{courseId}")
+    @PutMapping("/admin/{courseId}")
     public ApiResponse<CourseResponse> updateCourse(
             @PathVariable Integer courseId,
             @RequestBody CourseRequest request,
@@ -78,6 +78,13 @@ public class CourseController {
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
         return courseService.deleteCourse(courseId, introspectRequest);
+    }
+
+    @GetMapping("/user/courses")
+    public Page<CourseResponse> getUserCourses(
+            @RequestBody IntrospectRequest token,
+            Pageable pageable) throws Exception {
+        return courseService.getCoursesByUser(token, pageable);
     }
 
 }
