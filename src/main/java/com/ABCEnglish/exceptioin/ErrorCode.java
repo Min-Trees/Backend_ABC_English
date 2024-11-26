@@ -14,7 +14,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     ROLE_NOT_FOUND(1005,"Role not found", HttpStatus.NOT_FOUND),
-    UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHENTICATED(1006, "Unauthenticated Wrong Password", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(1005, "Course not found",HttpStatus.NOT_FOUND),
@@ -30,7 +30,8 @@ public enum ErrorCode {
     UNEXPECTED_ERROR(1006,"Unexpected error data", HttpStatus.BAD_REQUEST ),
     INVALID_DATE_RANGE(1006,"Error Date", HttpStatus.BAD_REQUEST),
     PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST),
-    ACCOUNT_NOT_VERTIFI(1007,"Account not veriti, please check your email",HttpStatus.BAD_REQUEST)
+    ACCOUNT_BANED(1007,"Account Baned please try again after 24h",HttpStatus.NOT_FOUND),
+    ACCOUNT_NOT_VERIFIED(1007,"Account not verified please check your email",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
