@@ -25,8 +25,6 @@ public class Doc {
     private String content;
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String description;
-    @Column(columnDefinition = "NVARCHAR(100)", nullable = false)
-    private String content;
     private String url;
     private String images;
 

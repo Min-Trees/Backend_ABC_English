@@ -19,7 +19,6 @@ public class DocResponse {
       String lesson;
       Integer creator; // Creator userId
       String name;
-      String content;
       String description;
       String content;
       String url;
