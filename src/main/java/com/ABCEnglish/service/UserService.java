@@ -13,15 +13,18 @@ import com.ABCEnglish.reponsesitory.UserRepository;
 import com.ABCEnglish.reponsesitory.VerificationTokenRepository;
 import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,6 +50,7 @@ public class UserService {
         user.setRole(role);
         user.setCreatedAt(new Date());
         user.setUpdatedAt(new Date());
+        user.setBan24h(false);
         user = userRepository.save(user);
 
         String token = VerificationToken.generateToken();
@@ -86,6 +90,25 @@ public class UserService {
             return users.map(userMapper::toUserResponse);
         }
         throw new AppException(ErrorCode.FORBIDDEN);
+    }
+
+    @Transactional
+    public void banUserFor24Hours(String phone) {
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setBan24h(true);
+        user.setBanUntil(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)); // +24h
+        userRepository.save(user);
+    }
+
+    @Scheduled(fixedRate = 3600000) // Mỗi giờ kiểm tra
+    public void resetBanStatus() {
+        List<User> bannedUsers = userRepository.findAllByBan24hTrueAndBanUntilBefore(new Date());
+        for (User user : bannedUsers) {
+            user.setBan24h(false);
+            user.setBanUntil(null);
+            userRepository.save(user);
+        }
     }
 
 
