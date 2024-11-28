@@ -21,7 +21,6 @@ public class DocResponse {
       String name;
       String content;
       String description;
-      String content;
       String url;
       String images;
       String type;

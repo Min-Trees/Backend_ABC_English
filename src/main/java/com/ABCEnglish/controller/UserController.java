@@ -29,6 +29,14 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
+    @GetMapping()
+    public ResponseEntity<Page<UserResponse>> getAllUsers(Pageable pageable,@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        Page<UserResponse> result = userService.getAllUsers(pageable,introspectRequest);
+        return ResponseEntity.ok(result);
+    }
     @PostMapping()
     public ApiResponse<UserResponse> createUser(@RequestBody @Valid RegisterRequest request) throws MessagingException {
         log.info("Received request to register user: {}", request);

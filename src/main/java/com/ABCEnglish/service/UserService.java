@@ -83,7 +83,7 @@ public class UserService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Role roleAdmin = roleRepository.findByName("Admin")
+        Role roleAdmin = roleRepository.findByName("admin")
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
         if (user.getRole().getName().equals(roleAdmin.getName())) {
             Page<User> users = userRepository.findAll(pageable);

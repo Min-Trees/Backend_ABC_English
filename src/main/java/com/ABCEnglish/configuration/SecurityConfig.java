@@ -1,14 +1,24 @@
 package com.ABCEnglish.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 public class SecurityConfig {
@@ -17,28 +27,51 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    @Value("${jwt.signerKey}")
+    private String signerKey;
 
     // Cấu hình phân quyền
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF
-                .authorizeHttpRequests(authorize -> authorize
-                        // Các API công cộng
-                        .requestMatchers("/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/verify").permitAll()
-                        .requestMatchers("/api/v1/auth/token").permitAll()
-                        .requestMatchers("/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/course/add").permitAll()
-                        .requestMatchers("/api/v1/course/updated/**").permitAll()
+        http.authorizeHttpRequests(request -> {
+            request.requestMatchers("/api/v1/auth/login").permitAll();
+            request.requestMatchers("/api/v1/verify/{token}").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/course").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/document/{courseId}").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/exercise/{lessonId}").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/question/{exerciseId}").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/answer/{questionId}").permitAll();
+            request.requestMatchers(HttpMethod.GET, "/api/v1/lesson/{courseId}").permitAll();
+            request.anyRequest().authenticated();
+        });
 
-                        // Các API chỉ dành cho người dùng có vai trò ADMIN
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+        // Thêm cấu hình CORS
+        http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-                        // Các API yêu cầu người dùng đã đăng nhập
-                        .anyRequest().permitAll()// Mặc định yêu cầu đăng nhập cho tất cả các API còn lại
-                );
+        http.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())));
         return http.build(); // Kết thúc cấu hình và trả về SecurityFilterChain
+    }
+    @Bean
+    JwtDecoder jwtDecoder(){
+        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
+        return NimbusJwtDecoder
+                .withSecretKey(secretKeySpec)
+                .macAlgorithm(MacAlgorithm.HS512)
+                .build();
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:5173"); // Frontend URL
+        config.addAllowedMethod("*"); // Cho phép tất cả các phương thức HTTP
+        config.addAllowedHeader("*"); // Cho phép tất cả các headers
+        config.setAllowCredentials(true); // Cho phép cookie
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     // Cấu hình UserDetailsService (dùng dữ liệu mẫu)
