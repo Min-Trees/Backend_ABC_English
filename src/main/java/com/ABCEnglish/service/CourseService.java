@@ -33,6 +33,7 @@ public class CourseService {
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final CourseOfUserRepository courseOfUserRepository;
+    private final UserService userService;
 
     public CourseResponse createCourse(CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // Lấy userId từ token
@@ -42,6 +43,10 @@ public class CourseService {
         // Kiểm tra người dùng tồn tại
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         System.out.println(userRepository.findById(userId));
         // Ánh xạ từ CourseRequest sang Course
         Course course = courseMapper.toCourse(request);
@@ -68,6 +73,10 @@ public class CourseService {
         // kiem tra xem user co ton tai hay khong
         User user =  userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // kiem tra xem nguoi tao co phai nguoi sua khong
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
@@ -106,6 +115,10 @@ public class CourseService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
@@ -132,7 +145,5 @@ public class CourseService {
                 courseMapper.courseResponse(courseOfUser.getCourse())
         );
     }
-
-
-
+    
 }

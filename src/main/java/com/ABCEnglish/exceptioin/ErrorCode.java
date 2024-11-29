@@ -29,7 +29,9 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(1005, "comment not found",HttpStatus.NOT_FOUND),
     UNEXPECTED_ERROR(1006,"Unexpected error data", HttpStatus.BAD_REQUEST ),
     INVALID_DATE_RANGE(1006,"Error Date", HttpStatus.BAD_REQUEST),
-    PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST)
+    PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST),
+    ACCESS_DENIED(1007, "Access denied: You do not have permission to perform this action", HttpStatus.FORBIDDEN)
+
 
     ;
 

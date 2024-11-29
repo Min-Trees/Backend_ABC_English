@@ -37,13 +37,17 @@ public class DocService {
     AuthenticationService authenticationService;
     LessonRepository lessonRepository;
     DocMapper docMapper;
-
+    UserService userService;
     public DocResponse createDoc(Integer lessonId,DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // lay thong tin user tu token
         Integer userId = authenticationService.introspectToken(token).getUserId();
         // kiem tra su ton tai cua user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -64,7 +68,10 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
-
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
@@ -109,7 +116,10 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 

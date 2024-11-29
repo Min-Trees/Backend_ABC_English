@@ -1,0 +1,237 @@
+[33mcommit 315196105e49378d18aeeb3e30ecfdf78a774850[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev-minhtri[m[33m)[m
+Merge: dd7e391 0417b0c
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Nov 19 10:45:01 2024 +0700
+
+    update get all
+
+[33mcommit dd7e3914ad98dd00876c106d4cc0b64a95922076[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Nov 19 10:13:56 2024 +0700
+
+     update get all
+
+[33mcommit 0417b0cee78b15d2a83006e270e0323ef0433bf9[m
+Author: KietLe <letuankiet26102003kl@gmail.com>
+Date:   Mon Nov 18 10:07:12 2024 -0330
+
+    document tư lesson id
+
+[33mcommit 6a0d7d6c66b222c05bea00fa36b971eae94328b1[m
+Author: KietLe <letuankiet26102003kl@gmail.com>
+Date:   Mon Nov 18 13:56:38 2024 +0700
+
+    sua noi dung ngan trong tai lieu
+
+[33mcommit 0f7e25de7cca57b4abfa20b51cc7a50feb952fba[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Sun Nov 17 17:34:54 2024 +0700
+
+    update api get all lesson
+
+[33mcommit c254b7ba69d98ef2f281634bbc0db8ce3d7e3e5d[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Sat Nov 16 21:00:18 2024 +0700
+
+    update courseResponse
+
+[33mcommit 12ead706b5925ba2ecc3da479c5635612c67f88c[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Nov 15 16:57:40 2024 +0700
+
+     fix done api question, answer, document
+
+[33mcommit 0ef8dd07e07f11fc33c430472d4458f64ed7c380[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Nov 15 11:25:55 2024 +0700
+
+     fix done response to fe
+
+[33mcommit 5f91783a808575f6b65707137e982face1a520b6[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Thu Nov 14 04:04:52 2024 +0700
+
+    done api comment for socilal
+
+[33mcommit 4a3a5375ac455917c7918af326871e7e83470fdc[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Nov 8 10:03:02 2024 +0700
+
+     done result exercise
+
+[33mcommit 0a04de6e7f697abfed87aa0da797e9cd12408712[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Nov 5 10:59:55 2024 +0700
+
+     done api result by exercise
+
+[33mcommit b3dc14368f915668b7fddd888af113ec5650a1bf[m
+Merge: 05c2b49 3f31cb5
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Mon Nov 4 03:41:34 2024 +0700
+
+    done send token to mail
+
+[33mcommit 05c2b49bdf975fc3c7715300fec56148e0c74155[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Mon Nov 4 03:40:10 2024 +0700
+
+    done send token to email
+
+[33mcommit cfde5b12fab8bfe52784cdb4d9df1b633b975789[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Thu Oct 31 10:42:56 2024 +0700
+
+     update sourse
+
+[33mcommit 3f31cb5a716b18ea0256a0f62ed39ab4e27bc74e[m
+Merge: 513b8b2 4f2648c
+Author: Nguyễn Phạm Minh Trí <137872528+Min-Trees@users.noreply.github.com>
+Date:   Wed Oct 30 19:36:50 2024 +0700
+
+    Merge pull request #4 from Min-Trees/main
+    
+    merge done api get object
+
+[33mcommit 513b8b2a04c42dd3713ba56e9cfe1f8bd4706ff2[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Wed Oct 30 19:32:33 2024 +0700
+
+    update source
+
+[33mcommit 4f1d1360090b9dc9db2032cfdb63c812cc29b284[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Wed Oct 30 19:21:03 2024 +0700
+
+    update source
+
+[33mcommit 4f2648c4fa7fa3a65e29aa5f70c7b710284f2bbc[m[33m ([m[1;32mmain[m[33m)[m
+Merge: 03d9ead 33a631c
+Author: Nguyễn Phạm Minh Trí <137872528+Min-Trees@users.noreply.github.com>
+Date:   Wed Oct 30 19:16:20 2024 +0700
+
+    Merge pull request #3 from Min-Trees/dev-minhtri
+    
+    update api get detail obj
+
+[33mcommit 33a631c0834d43bfeb71e32ffa33eda1b37cc9e7[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Wed Oct 30 19:12:07 2024 +0700
+
+    update api get detail obj
+
+[33mcommit 03d9eadc7b4ab2c654ce82500328f03eb770d8dc[m
+Merge: 922f559 b6f0add
+Author: KietLe261003 <145331267+KietLe261003@users.noreply.github.com>
+Date:   Wed Oct 30 16:32:18 2024 +0700
+
+    Merge pull request #2 from Min-Trees/dev-minhtri
+    
+    Dev minhtri
+
+[33mcommit b6f0add92e45875e517962d933e7be28689ea19f[m
+Merge: a1ddd60 922f559
+Author: KietLe261003 <145331267+KietLe261003@users.noreply.github.com>
+Date:   Wed Oct 30 16:29:06 2024 +0700
+
+    Merge branch 'main' into dev-minhtri
+
+[33mcommit a1ddd60fb9f840349db33689692b16f9c6929fce[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Wed Oct 30 01:49:13 2024 +0700
+
+     social done crud
+
+[33mcommit cb8aa22dbc1fe76c39fb723fb578ee7029ccffbd[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Oct 11 15:04:25 2024 +0700
+
+    updated user and answer
+
+[33mcommit 922f5596acea8787f3c10b8cbc23468af731f01d[m
+Author: KietLe261003 <letuankiet26102003kl@gmail.com>
+Date:   Thu Oct 3 21:37:35 2024 +0700
+
+    crud test
+
+[33mcommit bbadec5cf4e5fed460fda6ce9786bd1ca03fd197[m
+Merge: e71ea1a 301a55f
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Mon Sep 30 17:11:34 2024 +0700
+
+    Merge branch 'dev-minhtri'
+
+[33mcommit 301a55f99d74138516e78b2b4d0b8c48bb432f6e[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Sat Sep 28 16:49:24 2024 +0700
+
+    update register done
+
+[33mcommit e71ea1ac8374c497f4b393914135248a7cf4e756[m
+Merge: 48de377 aee7f1e
+Author: KietLe261003 <145331267+KietLe261003@users.noreply.github.com>
+Date:   Sat Sep 28 11:17:48 2024 +0700
+
+    Merge pull request #1 from Min-Trees/dev-kietle
+    
+    Dev kietle
+
+[33mcommit aee7f1ec1c097b3a306edc3e10914e07e65ac34c[m
+Author: KietLe <letuankiet26102003kl@gmail.com>
+Date:   Fri Sep 27 16:19:56 2024 +0700
+
+    get all test and cros for front end
+
+[33mcommit 30977c2e9a740ddffddb19955d84f2ae792809e1[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Sep 20 00:46:11 2024 +0700
+
+     done api lesson
+
+[33mcommit 5e81624b9f951f981ff0b1e8c1454ea9877f4fd0[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Thu Sep 19 10:57:32 2024 +0700
+
+     done api doc and updated api
+
+[33mcommit 58f22f35892b92685bb7c869dab719f1b99683d8[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Thu Sep 19 10:57:22 2024 +0700
+
+     done api doc and updated api
+
+[33mcommit 436bbb8a6eb6545da366744a29a62c763acd35d4[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Sep 17 08:39:13 2024 +0700
+
+    done course
+
+[33mcommit 1860e6147490e0b5583cd3bfc308c74821e8e95f[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Sep 13 16:26:58 2024 +0700
+
+     CRUD Course
+
+[33mcommit a0619baf48096ffc7e4a4475d9b0071b497f281d[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Thu Sep 12 18:19:14 2024 +0700
+
+     verify email done
+
+[33mcommit 48de377062a96d37e99e4b7d7a619a9e73f32b94[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Fri Sep 6 09:15:03 2024 +0700
+
+     login, register, auth
+
+[33mcommit a7b75892598a73199fa31a9fce473b27dc5a48ee[m[33m ([m[1;31morigin/dev[m[33m)[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Sep 3 13:44:43 2024 +0700
+
+    updated source
+
+[33mcommit 7609f468124dd7b9c2f96411396b69ba57f330c5[m
+Author: Min-Trees <2224802010382@student.tdmu.edu.vn>
+Date:   Tue Sep 3 11:33:15 2024 +0700
+
+    create source be
