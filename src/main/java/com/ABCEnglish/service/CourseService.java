@@ -92,6 +92,13 @@ public class CourseService {
         Page<Course> courses = courseRepository.findAllBy(pageable);
         return courses.map(courseMapper::courseResponse);
     }
+    public Page<CourseResponse> getAllCourseByTeacher(Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Page<Course> courses = courseRepository.findAllCoureByCreator(user,pageable);
+        return courses.map(courseMapper::courseResponse);
+    }
 
     public CourseResponse getCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();

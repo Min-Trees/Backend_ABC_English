@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,7 +30,11 @@ public class SecurityConfig {
     }
     @Value("${jwt.signerKey}")
     private String signerKey;
+    private final JwtLoggingFilter jwtLoggingFilter;
 
+    public SecurityConfig(JwtLoggingFilter jwtLoggingFilter) {
+        this.jwtLoggingFilter = jwtLoggingFilter;
+    }
     // Cấu hình phân quyền
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,7 +50,10 @@ public class SecurityConfig {
             request.anyRequest().authenticated();
         });
 
-        // Thêm cấu hình CORS
+        // Thêm JwtLoggingFilter trước UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtLoggingFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Cấu hình CORS và CSRF
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
