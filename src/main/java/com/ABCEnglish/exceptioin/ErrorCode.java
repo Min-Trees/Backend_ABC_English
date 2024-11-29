@@ -30,7 +30,8 @@ public enum ErrorCode {
     INVALID_DATE_RANGE(1006,"Error Date", HttpStatus.BAD_REQUEST),
     PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST),
     ACCESS_DENIED(1007, "Access denied: You do not have permission to perform this action", HttpStatus.FORBIDDEN),
-    ACCOUNT_NOT_VERIFICATION(1007,"Account not verify, please check your email",HttpStatus.BAD_REQUEST)
+    ACCOUNT_NOT_VERIFICATION(1007,"Account not verify, please check your email",HttpStatus.BAD_REQUEST),
+    RESULT_NOT_FOUND(1005, "result not found",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

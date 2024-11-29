@@ -33,6 +33,7 @@ public class CourseController {
         String token = authorizationHeader.substring("Bearer".length());
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
+        System.out.println(token);
         CourseResponse result = courseService.createCourse(request,introspectRequest);
         return ApiResponse.<CourseResponse>builder().result(result).build();
     }
