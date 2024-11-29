@@ -10,7 +10,7 @@ This project is an e-learning platform built using Spring Boot with a client-ser
 The registration process includes a two-step verification mechanism to ensure account security and authenticity. Here's how it works:
 - The user fills out the registration form with their email and other required information.
 - The system validates the submitted details and saves the user as "unverified" in the database.
-- ![Login](screenshoot/login.png)  
+- ![Login](screenshoot/login.jpg)  
 #### Verification Email
 - After the user submits the registration form, the system sends an email to the provided address.
 - The email contains a verification link with a unique token
