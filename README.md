@@ -64,9 +64,22 @@ The Automatic Grading feature allows learners to receive instant feedback on the
 - Java JDK 17 or higher
 - Maven installed
 - Spring Boot dependencies
+### ***Setup Database (SQL Server)***
+#### **Step 1: Create the Database**
+To set up the database for this project:
+
+1. Open **SQL Server Management Studio (SSMS)**.
+2. Connect to your SQL Server instance.
+3. Create a new database using the following SQL query:
+   ```sql
+   CREATE DATABASE EducationSystem1;
+**Step 2: Configure Database Connection in application.yaml**
+After creating the database, you need to configure the connection to SQL Server in your Spring Boot project. Modify the application.yaml file to include the connection details for the database.
+
+Open the application.yaml file located in the src/main/resources folder of your project.
+Update the database connection configuration as follows:
 
 ### **Steps to Run the Project**
-
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Min-Trees/Backend_ABC_English.git
@@ -74,3 +87,5 @@ The Automatic Grading feature allows learners to receive instant feedback on the
 2. **Install dependencies**
    ```bash
    mvn clean install
+
+
