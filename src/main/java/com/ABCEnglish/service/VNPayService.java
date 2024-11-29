@@ -65,8 +65,7 @@ public class VNPayService {
 
             // Calculate payment amount in VND (multiply by 100 for VNPay)
             BigDecimal amount = new BigDecimal(course.getFee())
-                    .multiply(BigDecimal.valueOf(100))
-                    .multiply(BigDecimal.valueOf(22000)); // Convert to VND
+                    .multiply(BigDecimal.valueOf(100)); // Convert to VND
 
             vnp_Params.put("vnp_Amount", amount.toString());
             vnp_Params.put("vnp_CurrCode", "VND");

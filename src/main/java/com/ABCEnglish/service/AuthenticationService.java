@@ -63,6 +63,11 @@ public class AuthenticationService {
         if (!authenticate) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+        //Nếu tài khoản chưa được xác thực
+        if(!user.getStatus())
+        {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFICATION);
+        }
 
         // Nếu người dùng đã đăng nhập thành công, tạo token cho người dùng
         var token = generateToken(user.getUserId());  // Truyền userId vào generateToken
