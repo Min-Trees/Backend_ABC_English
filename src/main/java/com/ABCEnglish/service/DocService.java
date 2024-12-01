@@ -44,6 +44,9 @@ public class DocService {
         // kiem tra su ton tai cua user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -64,7 +67,9 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
-
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
@@ -109,7 +114,9 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 

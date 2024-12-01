@@ -32,6 +32,7 @@ public enum ErrorCode {
     PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST),
     ACCOUNT_BANED(1007,"Account Baned please try again after 24h",HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_VERIFIED(1007,"Account not verified please check your email",HttpStatus.NOT_FOUND),
+    NOT_APPECT_ROLE(1008,"Not Appect Role",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

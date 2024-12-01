@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 
 @Service
 public class UserLogService {
@@ -27,6 +28,8 @@ public class UserLogService {
         log.setIpAddress(ipAddress);
         log.setAction(action);
         log.setMethod(method);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        log.setTimestamp(currentDateTime);
 
         if (!"Not Provided".equals(token)) {
             IntrospectRequest introspectRequest = new IntrospectRequest();

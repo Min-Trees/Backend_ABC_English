@@ -42,6 +42,9 @@ public class CourseService {
         // Kiểm tra người dùng tồn tại
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         System.out.println(userRepository.findById(userId));
         // Ánh xạ từ CourseRequest sang Course
         Course course = courseMapper.toCourse(request);
@@ -68,6 +71,10 @@ public class CourseService {
         // kiem tra xem user co ton tai hay khong
         User user =  userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         // kiem tra xem nguoi tao co phai nguoi sua khong
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
@@ -113,6 +120,9 @@ public class CourseService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
