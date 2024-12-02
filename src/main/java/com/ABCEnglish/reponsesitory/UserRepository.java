@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByPhone(String phone);
-
+    Optional<User> findByEmail(String email);
     Optional<User> findById(Integer userId);
     List<User> findAllByBan24hTrueAndBanUntilBefore(Date now);
 }
