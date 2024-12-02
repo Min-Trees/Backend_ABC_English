@@ -33,8 +33,6 @@ public enum ErrorCode {
     ACCOUNT_BANED(1007,"Account Baned please try again after 24h",HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_VERIFIED(1007,"Account not verified please check your email",HttpStatus.NOT_FOUND),
     NOT_APPECT_ROLE(1008,"Not Appect Role",HttpStatus.NOT_FOUND),
-    NOT_FOUND_CODE(1008,"Code vetion not found",HttpStatus.NOT_FOUND),
-    NOT_VERIFIED(1008,"Not Verified Code",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
