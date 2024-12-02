@@ -2,6 +2,7 @@ package com.ABCEnglish.service;
 
 import com.ABCEnglish.dto.request.AuthenticationRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
+import com.ABCEnglish.dto.request.ResetPasswordRequest;
 import com.ABCEnglish.dto.response.AuthenticationResponse;
 import com.ABCEnglish.dto.response.IntrospectResponse;
 import com.ABCEnglish.entity.User;
@@ -31,6 +32,8 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -47,7 +50,8 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
-
+    private final PasswordEncoder passwordEncoder;
+    private final Map<String, String> verificationCodes = new HashMap<>();
     @Autowired
     InvalidatedTokenRepository invalidatedTokenRepository;
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws KeyLengthException {
@@ -146,5 +150,30 @@ public class AuthenticationService {
         mailService.sendEmail(user.getEmail(),subject,body);
 
         return verificationUrl;
+    }
+    public String sendEmialResetPassword(String email)  {
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+            String code = mailService.sendVerificationCode(email); // Gọi phương thức gửi mã
+            verificationCodes.put(email, code); // Lưu mã vào Map tạm thời
+            return "Verification code sent to " + email;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return "Failed to send verification code: " + e.getMessage();
+        }
+    }
+    public String resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmai()).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+        String storedCode = verificationCodes.get(request.getEmai());
+        if (storedCode == null) {
+            throw new AppException(ErrorCode.NOT_FOUND_CODE);
+        }
+        if (!storedCode.equals(request.getCodeVetify())) {
+            throw new AppException(ErrorCode.NOT_VERIFIED);
+        }
+        verificationCodes.remove(request.getEmai());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return "Change your password success";
     }
 }
