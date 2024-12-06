@@ -51,6 +51,7 @@ public class SecurityConfig {
             request.anyRequest().authenticated();
         });
 
+
         // Thêm JwtLoggingFilter trước UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtLoggingFilter, UsernamePasswordAuthenticationFilter.class);
 
