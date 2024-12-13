@@ -1,49 +1,47 @@
 server:
   port: 8080
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
 
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: npminhtri.be@gmail.com # Sử dụng biến môi trường cho username
-    password: cfubhnaxnbdzsnta   # Sử dụng biến môi trường cho password
+    username: npminhtri.be@gmail.com
+    password: cfubhnaxnbdzsnta
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-          ssl:
-            trust: smtp.gmail.com
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true;useUnicode=true;characterEncoding=UTF-8
-    username: sa  # Sử dụng biến môi trường cho username
-    password: 12345678  # Sử dụng biến môi trường cho password
+    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem1;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: 12345678
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
 
   jpa:
     hibernate:
-      ddl-auto: create-drop # Tùy chọn có thể là: none, update, create, create-drop
+      ddl-auto: create
     properties:
       hibernate:
         naming:
           physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyNoOpImpl  # Giữ nguyên tên bảng và cột không thay đổi
           implicit-naming-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl  # Giữ nguyên tên bảng và cột không thay đổi
-    show-sql: true  # Hiển thị câu lệnh SQL trong log
-    open-in-view: true  # Giúp tránh lỗi LazyInitializationException khi truy xuất ngoài session
+    show-sql: true
+    open-in-view: true
 
   mvc:
     converters:
-      preferred-json-mapper: jackson  # Cấu hình Jackson làm mapper JSON mặc định
+      preferred-json-mapper: jackson
 
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 3600  # Thời gian hiệu lực của JWT (giây)
-  refreshable-duration: 36000  # Thời gian có thể làm mới JWT (giây)
-
+  valid-duration: 3600 # in seconds
+  refreshable-duration: 36000 # in seconds
