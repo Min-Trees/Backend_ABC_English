@@ -43,6 +43,8 @@ public class CourseService {
         // Kiểm tra người dùng tồn tại
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -73,6 +75,9 @@ public class CourseService {
         // kiem tra xem user co ton tai hay khong
         User user =  userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -101,6 +106,13 @@ public class CourseService {
         Page<Course> courses = courseRepository.findAllBy(pageable);
         return courses.map(courseMapper::courseResponse);
     }
+    public Page<CourseResponse> getAllCourseByTeacher(Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Page<Course> courses = courseRepository.findAllCoureByCreator(user,pageable);
+        return courses.map(courseMapper::courseResponse);
+    }
 
     public CourseResponse getCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
@@ -115,6 +127,8 @@ public class CourseService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
