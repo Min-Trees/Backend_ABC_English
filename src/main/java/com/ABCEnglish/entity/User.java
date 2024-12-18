@@ -19,7 +19,7 @@ public class User {
     private Role role;
     @Column(name = "password")
     private String password;
-    @Column(name = "username")
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String username;
     @Column(name = "fullname")
     private String fullname;

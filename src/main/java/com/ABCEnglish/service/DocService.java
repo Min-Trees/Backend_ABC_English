@@ -37,7 +37,7 @@ public class DocService {
     AuthenticationService authenticationService;
     LessonRepository lessonRepository;
     DocMapper docMapper;
-
+    UserService userService;
     public DocResponse createDoc(Integer lessonId,DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // lay thong tin user tu token
         Integer userId = authenticationService.introspectToken(token).getUserId();
@@ -46,6 +46,9 @@ public class DocService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
             throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
         // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
         Lesson lesson = lessonRepository.findById(lessonId)
@@ -69,6 +72,9 @@ public class DocService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
         if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
             throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -116,6 +122,9 @@ public class DocService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
             throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        boolean isAdmin = userService.isAdmin(userId);
+        if (!isAdmin) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));

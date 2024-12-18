@@ -15,7 +15,7 @@ spring:
             enable: true
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem1;encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true
     username: sa  # Tên người dùng CSDL
     password: 12345678  # Mật khẩu CSDL
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

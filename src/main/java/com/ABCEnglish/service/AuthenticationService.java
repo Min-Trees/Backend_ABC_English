@@ -70,6 +70,18 @@ public class AuthenticationService {
         if (!authenticate)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         var token = generateToken(Integer.valueOf(String.valueOf(user.getUserId())));  // Truyền userId vào generateToken
+
+        }
+        //Nếu tài khoản chưa được xác thực
+        if(!user.getStatus())
+        {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFICATION);
+        }
+
+        // Nếu người dùng đã đăng nhập thành công, tạo token cho người dùng
+        var token = generateToken(user.getUserId());  // Truyền userId vào generateToken
+
+        // Trả về thông tin đăng nhập của người dùng (token, thông tin người dùng...)
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)

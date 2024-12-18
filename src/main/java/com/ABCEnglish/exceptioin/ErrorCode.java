@@ -1,7 +1,6 @@
 package com.ABCEnglish.exceptioin;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 @Getter
@@ -30,11 +29,15 @@ public enum ErrorCode {
     UNEXPECTED_ERROR(1006,"Unexpected error data", HttpStatus.BAD_REQUEST ),
     INVALID_DATE_RANGE(1006,"Error Date", HttpStatus.BAD_REQUEST),
     PAYMENT_URL_CREATION_FAILED(1006,"Error creating VNPay payment URL", HttpStatus.BAD_REQUEST),
+
     ACCOUNT_BANED(1007,"Account Baned please try again after 24h",HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_VERIFIED(1007,"Account not verified please check your email",HttpStatus.NOT_FOUND),
     NOT_APPECT_ROLE(1008,"Not Appect Role",HttpStatus.NOT_FOUND),
     NOT_FOUND_CODE(1008,"Code vetion not found",HttpStatus.NOT_FOUND),
     NOT_VERIFIED(1008,"Not Verified Code",HttpStatus.NOT_FOUND),
+    ACCESS_DENIED(1007, "Access denied: You do not have permission to perform this action", HttpStatus.FORBIDDEN),
+    ACCOUNT_NOT_VERIFICATION(1007,"Account not verify, please check your email",HttpStatus.BAD_REQUEST),
+    RESULT_NOT_FOUND(1005, "result not found",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -92,6 +92,7 @@ public class UserService {
         throw new AppException(ErrorCode.FORBIDDEN);
     }
 
+
     @Transactional
     public void banUserFor24Hours(String phone) {
         User user = userRepository.findByPhone(phone)
@@ -109,6 +110,13 @@ public class UserService {
             user.setBanUntil(null);
             userRepository.save(user);
         }
+    public boolean isAdmin(Integer userId) {
+        // Lấy thông tin User từ database
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        // Kiểm tra vai trò ADMIN
+        return userOptional.isPresent() &&
+                "ADMIN".equalsIgnoreCase(userOptional.get().getRole().getName());
     }
 
 
