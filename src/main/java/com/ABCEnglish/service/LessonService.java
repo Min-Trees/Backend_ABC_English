@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,8 @@ public class LessonService {
     AuthenticationService authenticationService;
     UserRepository userRepository;
     CourseRepository courseRepository;
+    DocService docService;
+    ExerciseService exerciseService;
     public LessonResponse createdLesson(Integer courseId, LessonRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         // kiem tra su ton tai cua user
@@ -101,11 +104,23 @@ public class LessonService {
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
-        lessonRepository.delete(lesson);
+        lesson.setStatus(false);
+        lessonRepository.save(lesson);
         LessonDeleteResponse lessonDeleteResponse = new LessonDeleteResponse();
         lessonDeleteResponse.setLessonId(lessonId);
         lessonDeleteResponse.setStatus(false);
         lessonDeleteResponse.setMessage("delete success");
+        docService.deleteDocsByLesson(lesson);
+        exerciseService.deleteAllExerciseByLesson(lesson);
+
         return ApiResponse.<LessonDeleteResponse>builder().result(lessonDeleteResponse).build().getResult();
+    }
+
+    public void deleteAllLessonByCourse(Course course){
+        List<Lesson> lessons = lessonRepository.findByCourse(course);
+        for(Lesson lesson: lessons){
+            lesson.setStatus(false);
+        }
+        lessonRepository.saveAll(lessons);
     }
 }

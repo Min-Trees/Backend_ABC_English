@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -117,12 +118,20 @@ public class ExerciseService {
 
         Exercises exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
-
-        exerciseRepository.delete(exercise);
+        exercise.setStatus(false);
+        exerciseRepository.save(exercise);
         ExerciseDeleteResponse exerciseDeleteResponse = new ExerciseDeleteResponse();
         exerciseDeleteResponse.setExerciseId(exerciseId);
         exerciseDeleteResponse.setStatus(false);
         exerciseDeleteResponse.setMessage("delete success");
+
         return ApiResponse.<ExerciseDeleteResponse>builder().result(exerciseDeleteResponse).build().getResult();
+    }
+    public void deleteAllExerciseByLesson(Lesson lesson){
+        List<Exercises> exercisesList = exerciseRepository.findByLesson(lesson);
+        for(Exercises exercises: exercisesList){
+            exercises.setStatus(false);
+        }
+        exerciseRepository.saveAll(exercisesList);
     }
 }

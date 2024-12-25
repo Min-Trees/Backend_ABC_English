@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -125,13 +126,21 @@ public class DocService {
 
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
-
-        docRepository.delete(doc);
+        doc.setStatus(false);
+        docRepository.save(doc);
         DocDeleteResponse docDeleteResponse = new DocDeleteResponse();
         docDeleteResponse.setDocId(docId);
         docDeleteResponse.setStatus(false);
         docDeleteResponse.setMessage("delete success");
         return ApiResponse.<DocDeleteResponse>builder().result(docDeleteResponse).build().getResult();
+    }
+
+    public void deleteDocsByLesson(Lesson lesson) {
+        List<Doc> docs = docRepository.findAllByLesson(lesson);
+        for(Doc doc: docs){
+            doc.setStatus(false);
+        }
+        docRepository.saveAll(docs);
     }
 
 }
