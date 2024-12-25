@@ -2,6 +2,7 @@ package com.ABCEnglish.service;
 
 import com.ABCEnglish.dto.request.AuthenticationRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
+import com.ABCEnglish.dto.request.ResetPasswordRequest;
 import com.ABCEnglish.dto.response.AuthenticationResponse;
 import com.ABCEnglish.dto.response.IntrospectResponse;
 import com.ABCEnglish.entity.User;
@@ -31,6 +32,8 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -48,20 +51,24 @@ public class AuthenticationService {
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
 
+    private final Map<String, String> verificationCodes = new HashMap<>();
+
     @Autowired
     InvalidatedTokenRepository invalidatedTokenRepository;
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws KeyLengthException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-
-        // Tìm người dùng trong cơ sở dữ liệu theo số điện thoại
         var user = userRepository
                 .findByPhone(request.getPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        // Kiểm tra mật khẩu nhập vào có khớp với mật khẩu đã mã hóa trong cơ sở dữ liệu
+        if(user.getBan24h())
+            throw new AppException(ErrorCode.ACCOUNT_BANED);
+        if(!user.getStatus())
+            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
         boolean authenticate = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!authenticate) {
+        if (!authenticate){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+            // Truyền userId vào generateToken
+
         }
         //Nếu tài khoản chưa được xác thực
         if(!user.getStatus())
@@ -76,11 +83,10 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
-                .role(user.getRole()) // Lấy tên vai trò người dùng
+                .role(user.getRole())
                 .userId(user.getUserId())
                 .build();
     }
-
     private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -89,7 +95,7 @@ public class AuthenticationService {
                 .issuer("Abc_english")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
+                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("customClaim", "custom")
@@ -158,4 +164,35 @@ public class AuthenticationService {
 
         return verificationUrl;
     }
+
+    public String sendEmialResetPassword(String email)  {
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+            String code = mailService.sendVerificationCode(email); // Gọi phương thức gửi mã
+            verificationCodes.put(email, code); // Lưu mã vào Map tạm thời
+            return "Verification code sent to " + email;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return "Failed to send verification code: " + e.getMessage();
+        }
+    }
+    public String resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
+        String storedCode = verificationCodes.get(request.getEmail());
+        if (storedCode == null) {
+            throw new AppException(ErrorCode.NOT_FOUND_CODE);
+        }
+        if (!storedCode.equals(request.getCodeVetify())) {
+            throw new AppException(ErrorCode.NOT_VERIFIED);
+        }
+        PasswordEncoder passwordEncoder=passwordEncoder();
+        verificationCodes.remove(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return "Change your password success";
+    }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
+
 }

@@ -34,6 +34,7 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseOfUserRepository courseOfUserRepository;
     private final UserService userService;
+    private final LessonService lessonService;
 
     public CourseResponse createCourse(CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
         // Lấy userId từ token
@@ -127,6 +128,7 @@ public class CourseService {
         courseDeleteResponse.setCourseId(courseId);
         courseDeleteResponse.setStatus(false);
         courseDeleteResponse.setMessage("delete success");
+        lessonService.deleteAllLessonByCourse(course);
         return ApiResponse.<CourseDeleteResponse>builder().result(courseDeleteResponse).build().getResult();
     }
     public Page<CourseResponse> getCoursesByUser(IntrospectRequest token, Pageable pageable) throws ParseException, JOSEException {
@@ -145,5 +147,5 @@ public class CourseService {
                 courseMapper.courseResponse(courseOfUser.getCourse())
         );
     }
-    
+
 }

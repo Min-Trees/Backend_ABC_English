@@ -19,7 +19,7 @@ public class User {
     private Role role;
     @Column(name = "password")
     private String password;
-    @Column(name = "username")
+    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String username;
     @Column(name = "fullname")
     private String fullname;
@@ -41,5 +41,12 @@ public class User {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date updatedAt;
+
+    @Column(name = "ban_24h")
+    private Boolean ban24h = false;
+
+    @Column(name = "ban_until")
+    @Temporal(TemporalType.TIMESTAMP)
+    private java.util.Date banUntil;
 
 }

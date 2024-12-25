@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,9 @@ public class DocService {
         // kiem tra su ton tai cua user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -68,6 +72,9 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+            }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -112,10 +119,14 @@ public class DocService {
         return docs.map(docMapper::docResponse);
     }
 
+
     public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -125,13 +136,21 @@ public class DocService {
 
         Doc doc = docRepository.findById(docId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOC_NOT_FOUND));
-
-        docRepository.delete(doc);
+        doc.setStatus(false);
+        docRepository.save(doc);
         DocDeleteResponse docDeleteResponse = new DocDeleteResponse();
         docDeleteResponse.setDocId(docId);
         docDeleteResponse.setStatus(false);
         docDeleteResponse.setMessage("delete success");
         return ApiResponse.<DocDeleteResponse>builder().result(docDeleteResponse).build().getResult();
+    }
+
+    public void deleteDocsByLesson(Lesson lesson) {
+        List<Doc> docs = docRepository.findAllByLesson(lesson);
+        for(Doc doc: docs){
+            doc.setStatus(false);
+        }
+        docRepository.saveAll(docs);
     }
 
 }

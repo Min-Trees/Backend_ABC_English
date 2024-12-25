@@ -26,15 +26,15 @@ public class DocController {
 
     DocService docService;
 
-    @PostMapping("/{courseId}")
+    @PostMapping("/{lessonId}")
     public ApiResponse<DocResponse> addDoc(
             @RequestBody DocRequest request,
-            @PathVariable Integer courseId,
+            @PathVariable Integer lessonId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
         String token = authorizationHeader.substring("Bearer".length());
         IntrospectRequest introspectRequest = new IntrospectRequest();
         introspectRequest.setToken(token);
-        DocResponse result = docService.createDoc(courseId,request,introspectRequest);
+        DocResponse result = docService.createDoc(lessonId,request,introspectRequest);
         return ApiResponse.<DocResponse>builder().result(result).build();
     }
 
