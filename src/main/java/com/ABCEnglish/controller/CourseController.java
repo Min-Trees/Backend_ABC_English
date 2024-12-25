@@ -57,17 +57,7 @@ public class CourseController {
         Page<CourseResponse> courseResponses = courseService.getAllCourse(pageable);
         return ResponseEntity.ok(courseResponses);
     }
-    @GetMapping("/allbycreator")
-    public ResponseEntity<Page<CourseResponse>> getAllCourseByCreator(
-            Pageable pageable,
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        // tao token moi
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        Page<CourseResponse> courseResponses = courseService.getAllCourseByTeacher(pageable,introspectRequest);
-        return ResponseEntity.ok(courseResponses);
-    }
+
     @GetMapping("/{courseId}")
     public ApiResponse<CourseResponse> getCourse(
             @PathVariable Integer courseId,
