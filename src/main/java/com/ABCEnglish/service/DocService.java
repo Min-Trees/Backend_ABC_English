@@ -45,6 +45,9 @@ public class DocService {
         // kiem tra su ton tai cua user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -69,6 +72,9 @@ public class DocService {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+            }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
@@ -113,10 +119,14 @@ public class DocService {
         return docs.map(docMapper::docResponse);
     }
 
+
     public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
+            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
+        }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);

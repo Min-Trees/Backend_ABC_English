@@ -15,8 +15,8 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DocRequest {
      String name;
-     String content;
      String description;
+     String content;
      String url;
      String images;
      Doc.DocType type;

@@ -147,5 +147,5 @@ public class CourseService {
                 courseMapper.courseResponse(courseOfUser.getCourse())
         );
     }
-    
+
 }

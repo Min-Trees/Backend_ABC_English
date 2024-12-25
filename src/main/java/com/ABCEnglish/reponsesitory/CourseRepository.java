@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpecificationExecutor<Course> {
     Optional<Course> findByCourseIdAndCreator(Integer courseId, User creator);
-
+    Page<Course> findAllCoureByCreator(User creator, Pageable pageable);
     Page<Course> findAllBy(Pageable pageable);
     Optional<Course> findByCourseId(Integer courseId);
 

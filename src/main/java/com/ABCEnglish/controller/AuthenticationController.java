@@ -1,8 +1,6 @@
 package com.ABCEnglish.controller;
 
-import com.ABCEnglish.dto.request.ApiResponse;
-import com.ABCEnglish.dto.request.AuthenticationRequest;
-import com.ABCEnglish.dto.request.IntrospectRequest;
+import com.ABCEnglish.dto.request.*;
 import com.ABCEnglish.dto.response.AuthenticationResponse;
 import com.ABCEnglish.dto.response.IntrospectResponse;
 import com.ABCEnglish.service.AuthenticationService;
@@ -39,6 +37,21 @@ public class AuthenticationController {
         var result = authenticationService.introspectToken(request);
         return ApiResponse.<IntrospectResponse>builder()
                 .result(result)
+                .build();
+    }
+
+    @PostMapping("/requestresetpassword")
+    public ApiResponse<String> resetPassword(@RequestBody EmailRequest request){
+        var res = authenticationService.sendEmialResetPassword(request.getEmail());
+        return ApiResponse.<String>builder()
+                .result(res)
+                .build();
+    }
+    @PostMapping("/resetPassword")
+    public ApiResponse<String> resetPassword(@RequestBody ResetPasswordRequest request)  {
+        var res = authenticationService.resetPassword(request);
+        return ApiResponse.<String>builder()
+                .result(res)
                 .build();
     }
 }
