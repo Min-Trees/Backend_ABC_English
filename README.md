@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 **# ABC-ENGLISH**
 **## Overview**
 This project is an e-learning platform built using Spring Boot with a client-server architecture. The system provides functionalities for user registration, managing courses, tracking progress, and interactive features like messaging and forums.
@@ -34,6 +35,8 @@ Automatically evaluates grammar-based text questions.
 ### Notifications and Reminders
 Sends alerts for new lessons and reminders for pending assignments.
 
+=======
+>>>>>>> f9e08fe8e1f20fd2fd2b04c0878cecc9db322b64
 # CyberSecurityBackEnd
 # **ABC-ENGLISH**
 

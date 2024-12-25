@@ -74,7 +74,7 @@ public class DocService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
         if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
             throw new AppException(ErrorCode.NOT_APPECT_ROLE);
-            }
+        }
         boolean isAdmin = userService.isAdmin(userId);
         if (!isAdmin) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
