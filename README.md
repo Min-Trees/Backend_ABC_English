@@ -1,5 +1,5 @@
 
-<<<<<<< HEAD
+
 **# ABC-ENGLISH**
 **## Overview**
 This project is an e-learning platform built using Spring Boot with a client-server architecture. The system provides functionalities for user registration, managing courses, tracking progress, and interactive features like messaging and forums.
