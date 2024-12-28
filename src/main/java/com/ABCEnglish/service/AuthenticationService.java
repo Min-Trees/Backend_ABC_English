@@ -62,8 +62,9 @@ public class AuthenticationService {
         var user = userRepository
                 .findByPhone(request.getPhone())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(user.getBan24h())
+        if (Boolean.TRUE.equals(user.getBan24h())) {
             throw new AppException(ErrorCode.ACCOUNT_BANED);
+        }
         if(!user.getStatus())
             throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
         boolean authenticate = passwordEncoder.matches(request.getPassword(), user.getPassword());

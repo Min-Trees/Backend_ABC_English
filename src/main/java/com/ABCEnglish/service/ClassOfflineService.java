@@ -1,7 +1,9 @@
 package com.ABCEnglish.service;
 
+import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.ClassOfflineRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
+import com.ABCEnglish.dto.response.ClassOfflineDeleteResponse;
 import com.ABCEnglish.dto.response.ClassOfflineResponse;
 import com.ABCEnglish.entity.ClassOffline;
 import com.ABCEnglish.entity.Course;
@@ -18,6 +20,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -90,6 +94,58 @@ public class ClassOfflineService {
             log.error("Unexpected error occurred while adding class: {}", ex.getMessage(), ex);
             throw new AppException(ErrorCode.UNEXPECTED_ERROR);
         }
+    }
+
+    public ClassOfflineResponse updateClassOffline(ClassOfflineRequest request, Integer classId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        ClassOffline classOffline = classOfflineRepository.findById(classId)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
+        classOfflineMapper.updateClassOffline(request,classOffline);
+        classOffline.setUpdatedAt(new Date());
+        classOfflineRepository.save(classOffline);
+        return  classOfflineMapper.classOfflineResponse(classOffline);
+    }
+
+    public ClassOfflineResponse getClass(Integer classId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        ClassOffline classOffline = classOfflineRepository.findById(classId)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
+        return classOfflineMapper.classOfflineResponse(classOffline);
+    }
+
+    public Page<ClassOfflineResponse> getAllClass(Pageable pageable, Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Page<ClassOffline> classList =  classOfflineRepository.findAllBy(pageable,course);
+        return classList.map(classOfflineMapper::classOfflineResponse);
+    }
+
+    public ClassOfflineDeleteResponse deleteClassOffline(Integer courseId, Integer classId,IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        ClassOffline classOffline = classOfflineRepository.findById(classId)
+                .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
+        classOffline.setStatus(false);
+        classOfflineRepository.save(classOffline);
+        ClassOfflineDeleteResponse result = new ClassOfflineDeleteResponse();
+        result.setClassId(classId);
+        result.setMessage("delete success");
+        result.setStatus(true);
+        return ApiResponse.<ClassOfflineDeleteResponse>builder().result(result).build().getResult();
     }
 
 }

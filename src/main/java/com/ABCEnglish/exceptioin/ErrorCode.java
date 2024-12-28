@@ -38,6 +38,7 @@ public enum ErrorCode {
     ACCESS_DENIED(1007, "Access denied: You do not have permission to perform this action", HttpStatus.FORBIDDEN),
     ACCOUNT_NOT_VERIFICATION(1007,"Account not verify, please check your email",HttpStatus.BAD_REQUEST),
     RESULT_NOT_FOUND(1005, "result not found",HttpStatus.NOT_FOUND),
+    CLASS_NOT_FOUND(1005, "class not found",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

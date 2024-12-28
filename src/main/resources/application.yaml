@@ -5,8 +5,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}  # Biến môi trường cho tên người dùng email
-    password: ${MAIL_PASSWORD}  # Biến môi trường cho mật khẩu email
+    username: ${MAIL_USERNAME:npminhtri.be@gmail.com}  # Biến môi trường cho tên người dùng email
+    password: ${MAIL_PASSWORD:cfubhnaxnbdzsnta}  # Biến môi trường cho mật khẩu email
     properties:
       mail:
         smtp:

@@ -1,8 +1,7 @@
 package com.ABCEnglish.service;
 
-import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.request.RegisterRequest;
-import com.ABCEnglish.dto.request.StatusRequest;
+import com.ABCEnglish.dto.request.*;
+import com.ABCEnglish.dto.response.UserDeleteResponse;
 import com.ABCEnglish.dto.response.UserResponse;
 import com.ABCEnglish.entity.*;
 import com.ABCEnglish.exceptioin.AppException;
@@ -62,6 +61,16 @@ public class UserService {
         userResponse.setToken(token);
         return userResponse;
     }
+    public UserResponse updateUser(UserRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        // kiem tra su ton tai cua user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userMapper.updateUser(request,user);
+        user.setUpdatedAt(new Date());
+        User updateUser = userRepository.save(user);
+        return userMapper.toUserResponse(updateUser);
+    }
 
     public Boolean updateStatus(Integer userId,StatusRequest request){
         User user = userRepository.findById(userId)
@@ -119,6 +128,24 @@ public class UserService {
         // Kiểm tra vai trò ADMIN
         return userOptional.isPresent() &&
                 "ADMIN".equalsIgnoreCase(userOptional.get().getRole().getName());
+    }
+
+    public UserDeleteResponse deleteUser(Integer userDeleteId, IntrospectRequest token) throws ParseException, JOSEException {
+        Integer userId = authenticationService.introspectToken(token).getUserId();
+        // kiem tra su ton tai cua user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(isAdmin(userId)){
+            User userDelete = userRepository.findById(userDeleteId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            userDelete.setStatus(false);
+            UserDeleteResponse response = new UserDeleteResponse();
+            response.setUserId(userDeleteId);
+            response.setMessage("delete success");
+            response.setStatus(true);
+            return ApiResponse.<UserDeleteResponse>builder().result(response).build().getResult();
+        }
+        throw new AppException(ErrorCode.ACCESS_DENIED);
     }
 
 

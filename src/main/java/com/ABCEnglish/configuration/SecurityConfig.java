@@ -93,7 +93,7 @@ public class SecurityConfig {
                 return User.builder()
                         .username("admin")
                         .password(passwordEncoder().encode("admin123")) // Mật khẩu đã mã hóa
-                        .roles("ADMIN") // Gán vai trò ADMIN
+                        .roles("admin") // Gán vai trò ADMIN
                         .build();
             } else if ("user".equals(username)) {
                 return User.builder()

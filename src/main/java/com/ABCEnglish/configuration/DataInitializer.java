@@ -33,7 +33,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByPhone("admin").isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setFullname("Administrator");
+            admin.setFullName("Administrator");
             admin.setEmail("admin@example.com");
             admin.setPhone("admin");
             admin.setPassword(passwordEncoder.encode("password123")); // Mật khẩu mã hóa

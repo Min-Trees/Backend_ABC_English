@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AnswerEssayRequest {
-    Boolean isCorrect;
-    String content;
-    Boolean status;
+public class UserRequest {
+    String username;
+    String fullName;
+    String description;
 }

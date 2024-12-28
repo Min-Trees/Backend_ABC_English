@@ -1,6 +1,7 @@
 package com.ABCEnglish.mapper;
 
 import com.ABCEnglish.dto.request.RegisterRequest;
+import com.ABCEnglish.dto.request.UserRequest;
 import com.ABCEnglish.dto.response.UserResponse;
 import com.ABCEnglish.entity.User;
 import org.mapstruct.AfterMapping;
@@ -18,4 +19,5 @@ public interface UserMapper {
         String code = "USER" + user.getUserId();
         userResponse.setToken(code);
     }
+    void updateUser(UserRequest request,@MappingTarget User user);
 }

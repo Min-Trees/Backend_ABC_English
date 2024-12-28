@@ -29,7 +29,7 @@ public class ClassOffline {
     LocalTime startTime;
 
     LocalTime endTime;
-
+    Boolean status;
     Date startDate;
 
     Date endDate;
@@ -38,7 +38,6 @@ public class ClassOffline {
     @CollectionTable(name = "class_offline_days", joinColumns = @JoinColumn(name = "class_id"))
     @Enumerated(EnumType.STRING)
     List<DayOfWeek> dayOfWeekList;
-
     Integer quantitySession;
     Date createdAt;
     Date updatedAt;

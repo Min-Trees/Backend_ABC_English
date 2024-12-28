@@ -1,4 +1,4 @@
-package com.ABCEnglish.dto.request;
+package com.ABCEnglish.dto.response;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AnswerEssayRequest {
-    Boolean isCorrect;
-    String content;
-    Boolean status;
+public class ClassOfflineDeleteResponse {
+    int classId;
+    boolean status;
+    String message;
 }
