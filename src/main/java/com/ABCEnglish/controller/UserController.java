@@ -107,4 +107,16 @@ public class UserController {
         userService.banUserFor24Hours(phone.getPhone());
         return ResponseEntity.ok("User banned for 24 hours");
     }
+
+    @PutMapping("/update-permission/{userId}")
+    public ApiResponse<UserResponse> updatePermission(
+            @PathVariable Integer userId,
+            @RequestBody RoleUpdate roleId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.substring("Bearer".length());
+        IntrospectRequest introspectRequest = new IntrospectRequest();
+        introspectRequest.setToken(token);
+        UserResponse result = userService.updatePermission(userId,introspectRequest,roleId.getRoleId());
+        return ApiResponse.<UserResponse>builder().result(result).build();
+    }
 }

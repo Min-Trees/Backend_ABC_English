@@ -148,5 +148,23 @@ public class UserService {
         throw new AppException(ErrorCode.ACCESS_DENIED);
     }
 
+    public  UserResponse updatePermission(Integer userId, IntrospectRequest token, Integer roleId) throws ParseException, JOSEException {
+        Integer admin = authenticationService.introspectToken(token).getUserId();
+        // kiem tra su ton tai cua user
+        User user = userRepository.findById(admin)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if(isAdmin(admin)){
+            User userUpdate = userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            Role role = roleRepository.findById(roleId)
+                            .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            userUpdate.setRole(role);
+            userRepository.save(userUpdate);
+            return userMapper.toUserResponse(userUpdate);
+        }
+        throw new AppException(ErrorCode.ACCESS_DENIED);
+
+    }
+
 
 }
