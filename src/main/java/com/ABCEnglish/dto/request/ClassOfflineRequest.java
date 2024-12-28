@@ -18,6 +18,7 @@ public class ClassOfflineRequest {
     String description;
     LocalTime startTime;
     LocalTime endTime;
+    Boolean status = true;
     Date startDate;
     Date endDate;
     List<String> dayOfWeekList;

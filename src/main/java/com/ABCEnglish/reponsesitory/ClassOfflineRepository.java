@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClassOfflineRepository extends JpaRepository<ClassOffline, Integer> {
-    Page<ClassOffline> findAllBy(Pageable pageable, Course course);
+    Page<ClassOffline> findAllByCourse(Course course, Pageable pageable);
 }

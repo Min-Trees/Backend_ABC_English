@@ -104,6 +104,14 @@ public class ClassOfflineService {
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         classOfflineMapper.updateClassOffline(request,classOffline);
+        LocalDate startDate = classOffline.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endDate = classOffline.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
+        weeksBetween = weeksBetween == 0 ? 1 : weeksBetween;
+
+        int totalSession = (int) (weeksBetween * classOffline.getDayOfWeekList().size());
+        classOffline.setQuantitySession(totalSession);
         classOffline.setUpdatedAt(new Date());
         classOfflineRepository.save(classOffline);
         return  classOfflineMapper.classOfflineResponse(classOffline);
@@ -119,24 +127,22 @@ public class ClassOfflineService {
         return classOfflineMapper.classOfflineResponse(classOffline);
     }
 
-    public Page<ClassOfflineResponse> getAllClass(Pageable pageable, Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
+    public Page<ClassOfflineResponse> getAllClass(Integer courseId,Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        Page<ClassOffline> classList =  classOfflineRepository.findAllBy(pageable,course);
+        Page<ClassOffline> classList =  classOfflineRepository.findAllByCourse(course,pageable);
         return classList.map(classOfflineMapper::classOfflineResponse);
     }
 
-    public ClassOfflineDeleteResponse deleteClassOffline(Integer courseId, Integer classId,IntrospectRequest token) throws ParseException, JOSEException {
+    public ClassOfflineDeleteResponse deleteClassOffline(Integer classId,IntrospectRequest token) throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         classOffline.setStatus(false);

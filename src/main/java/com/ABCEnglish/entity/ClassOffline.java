@@ -29,7 +29,7 @@ public class ClassOffline {
     LocalTime startTime;
 
     LocalTime endTime;
-    Boolean status;
+    Boolean status = true;
     Date startDate;
 
     Date endDate;
