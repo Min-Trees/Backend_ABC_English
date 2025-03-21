@@ -5,16 +5,14 @@ import com.ABCEnglish.dto.request.ClassOfflineRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.ClassOfflineDeleteResponse;
 import com.ABCEnglish.dto.response.ClassOfflineResponse;
-import com.ABCEnglish.entity.ClassOffline;
-import com.ABCEnglish.entity.Course;
-import com.ABCEnglish.entity.DayOfWeek;
-import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.entity.*;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.ClassOfflineMapper;
-import com.ABCEnglish.reponsesitory.ClassOfflineRepository;
-import com.ABCEnglish.reponsesitory.CourseRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.ClassOfflineRepository;
+import com.ABCEnglish.repository.ClassOfflineSessionRepository;
+import com.ABCEnglish.repository.CourseRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +25,11 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
+import java.time.DayOfWeek; // Import từ java.time
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +41,10 @@ public class ClassOfflineService {
     CourseRepository courseRepository;
     ClassOfflineMapper classOfflineMapper;
     ClassOfflineRepository classOfflineRepository;
+    ClassOfflineSessionRepository classOfflineSessionRepository;
 
-    public ClassOfflineResponse addClass(ClassOfflineRequest request, Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
+    public ClassOfflineResponse addClass(ClassOfflineRequest request, Integer courseId, IntrospectRequest token)
+            throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
@@ -52,41 +54,49 @@ public class ClassOfflineService {
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         try {
+            log.info("Request received: {}", request);
+
             if (request.getStartDate() == null || request.getEndDate() == null) {
+                log.error("StartDate or EndDate is null");
                 throw new AppException(ErrorCode.INVALID_DATE_RANGE);
             }
-
             if (!request.getEndDate().after(request.getStartDate())) {
+                log.error("EndDate is not after StartDate - startDate: {}, endDate: {}",
+                        request.getStartDate(), request.getEndDate());
                 throw new AppException(ErrorCode.INVALID_DATE_RANGE);
             }
 
-            // Ánh xạ thủ công dayOfWeekList
             List<DayOfWeek> dayOfWeekList = request.getDayOfWeekList().stream()
-                    .map(DayOfWeek::valueOf)
-                    .toList();
+                    .map(day -> DayOfWeek.valueOf(day.toUpperCase())) // Sử dụng java.time.DayOfWeek
+                    .collect(Collectors.toList());
 
+            log.info("Parsed data - startDate: {}, endDate: {}, dayOfWeekList: {}",
+                    request.getStartDate(), request.getEndDate(), dayOfWeekList);
 
-            // Tạo ClassOffline từ request
             ClassOffline classOffline = classOfflineMapper.toClassOffline(request);
             classOffline.setCourse(course);
             classOffline.setCreatedAt(new Date());
             classOffline.setUpdatedAt(new Date());
             classOffline.setDayOfWeekList(dayOfWeekList);
 
-            // Tính toán số lượng buổi học
-            LocalDate startDate = classOffline.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate endDate = classOffline.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            classOfflineRepository.save(classOffline);
 
-            long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
-            weeksBetween = weeksBetween == 0 ? 1 : weeksBetween;
+            ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
+            LocalDate startDate = classOffline.getStartDate().toInstant().atZone(zoneId).toLocalDate();
+            LocalDate endDate = classOffline.getEndDate().toInstant().atZone(zoneId).toLocalDate();
 
-            int totalSession = (int) (weeksBetween * classOffline.getDayOfWeekList().size());
-            classOffline.setQuantitySession(totalSession);
+            List<ClassOfflineSession> newSessions = generateSessions(classOffline, startDate, endDate, dayOfWeekList);
+            classOffline.getSessions().clear();
+            classOffline.getSessions().addAll(newSessions);
+            classOffline.setQuantitySession(classOffline.getSessions().size());
 
             classOfflineRepository.save(classOffline);
 
             return classOfflineMapper.classOfflineResponse(classOffline);
 
+        } catch (IllegalArgumentException ex) {
+            log.error("Invalid day of week: {}", ex.getMessage(), ex);
+            throw new AppException(ErrorCode.UNEXPECTED_ERROR);
         } catch (AppException ex) {
             log.error("Error while adding class: {}", ex.getMessage(), ex);
             throw ex;
@@ -96,25 +106,80 @@ public class ClassOfflineService {
         }
     }
 
-    public ClassOfflineResponse updateClassOffline(ClassOfflineRequest request, Integer classId, IntrospectRequest token) throws ParseException, JOSEException {
+    public ClassOfflineResponse updateClassOffline(ClassOfflineRequest request, Integer classId, IntrospectRequest token)
+            throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
-        classOfflineMapper.updateClassOffline(request,classOffline);
-        LocalDate startDate = classOffline.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate endDate = classOffline.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
-        weeksBetween = weeksBetween == 0 ? 1 : weeksBetween;
+        try {
+            if (request.getStartDate() == null || request.getEndDate() == null) {
+                log.error("StartDate or EndDate is null");
+                throw new AppException(ErrorCode.INVALID_DATE_RANGE);
+            }
+            if (!request.getEndDate().after(request.getStartDate())) {
+                log.error("EndDate is not after StartDate - startDate: {}, endDate: {}",
+                        request.getStartDate(), request.getEndDate());
+                throw new AppException(ErrorCode.INVALID_DATE_RANGE);
+            }
 
-        int totalSession = (int) (weeksBetween * classOffline.getDayOfWeekList().size());
-        classOffline.setQuantitySession(totalSession);
-        classOffline.setUpdatedAt(new Date());
-        classOfflineRepository.save(classOffline);
-        return  classOfflineMapper.classOfflineResponse(classOffline);
+            classOfflineMapper.updateClassOffline(request, classOffline);
+            List<DayOfWeek> dayOfWeekList = request.getDayOfWeekList().stream()
+                    .map(day -> DayOfWeek.valueOf(day.toUpperCase())) // Sử dụng java.time.DayOfWeek
+                    .collect(Collectors.toList());
+            classOffline.setDayOfWeekList(dayOfWeekList);
+
+            ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
+            LocalDate startDate = classOffline.getStartDate().toInstant().atZone(zoneId).toLocalDate();
+            LocalDate endDate = classOffline.getEndDate().toInstant().atZone(zoneId).toLocalDate();
+
+            List<ClassOfflineSession> newSessions = generateSessions(classOffline, startDate, endDate, dayOfWeekList);
+            classOffline.getSessions().clear();
+            classOffline.getSessions().addAll(newSessions);
+            classOffline.setQuantitySession(classOffline.getSessions().size());
+            classOffline.setUpdatedAt(new Date());
+
+            classOfflineRepository.save(classOffline);
+
+            return classOfflineMapper.classOfflineResponse(classOffline);
+
+        } catch (IllegalArgumentException ex) {
+            log.error("Invalid day of week: {}", ex.getMessage(), ex);
+            throw new AppException(ErrorCode.UNEXPECTED_ERROR);
+        } catch (AppException ex) {
+            log.error("Error while updating class: {}", ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Unexpected error occurred while updating class: {}", ex.getMessage(), ex);
+            throw new AppException(ErrorCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    private List<ClassOfflineSession> generateSessions(ClassOffline classOffline, LocalDate startDate, LocalDate endDate, List<DayOfWeek> dayOfWeekList) {
+        List<ClassOfflineSession> sessions = new ArrayList<>();
+        LocalDate currentDate = startDate;
+        ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
+
+        log.info("Generating sessions - startDate: {}, endDate: {}, dayOfWeekList: {}", startDate, endDate, dayOfWeekList);
+        log.info("Running updated generateSessions version - 2025-03-20");
+
+        while (!currentDate.isAfter(endDate)) {
+            log.info("Checking date: {}, day of week: {}", currentDate, currentDate.getDayOfWeek());
+            if (dayOfWeekList.contains(currentDate.getDayOfWeek())) {
+                ClassOfflineSession session = new ClassOfflineSession();
+                session.setClassOffline(classOffline);
+                session.setSessionDate(Date.from(currentDate.atStartOfDay(zoneId).toInstant()));
+                sessions.add(session);
+                log.info("Added session for date: {}", currentDate);
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+        log.info("Total sessions generated: {}", sessions.size());
+        return sessions;
     }
 
     public ClassOfflineResponse getClass(Integer classId, IntrospectRequest token) throws ParseException, JOSEException {
@@ -127,18 +192,20 @@ public class ClassOfflineService {
         return classOfflineMapper.classOfflineResponse(classOffline);
     }
 
-    public Page<ClassOfflineResponse> getAllClass(Integer courseId,Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
+    public Page<ClassOfflineResponse> getAllClass(Integer courseId, Pageable pageable, IntrospectRequest token)
+            throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        Page<ClassOffline> classList =  classOfflineRepository.findAllByCourse(course,pageable);
+        Page<ClassOffline> classList = classOfflineRepository.findAllByCourse(course, pageable);
         return classList.map(classOfflineMapper::classOfflineResponse);
     }
 
-    public ClassOfflineDeleteResponse deleteClassOffline(Integer classId,IntrospectRequest token) throws ParseException, JOSEException {
+    public ClassOfflineDeleteResponse deleteClassOffline(Integer classId, IntrospectRequest token)
+            throws ParseException, JOSEException {
         Integer userId = authenticationService.introspectToken(token).getUserId();
 
         User user = userRepository.findById(userId)
@@ -147,11 +214,11 @@ public class ClassOfflineService {
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         classOffline.setStatus(false);
         classOfflineRepository.save(classOffline);
+
         ClassOfflineDeleteResponse result = new ClassOfflineDeleteResponse();
         result.setClassId(classId);
-        result.setMessage("delete success");
+        result.setMessage("Delete success");
         result.setStatus(true);
         return ApiResponse.<ClassOfflineDeleteResponse>builder().result(result).build().getResult();
     }
-
 }

@@ -2,8 +2,8 @@ package com.ABCEnglish.configuration;
 
 import com.ABCEnglish.entity.Role;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.reponsesitory.RoleRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.RoleRepository;
+import com.ABCEnglish.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

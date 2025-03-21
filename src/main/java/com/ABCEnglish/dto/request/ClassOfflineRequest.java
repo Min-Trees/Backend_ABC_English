@@ -1,5 +1,6 @@
 package com.ABCEnglish.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,12 @@ public class ClassOfflineRequest {
     LocalTime startTime;
     LocalTime endTime;
     Boolean status = true;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date startDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date endDate;
+
     List<String> dayOfWeekList;
 }

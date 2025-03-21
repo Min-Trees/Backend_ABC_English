@@ -1,36 +1,29 @@
 package com.ABCEnglish.service;
 
 import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.request.ResultExerciseRequest;
 import com.ABCEnglish.dto.response.ResultExerciseResponse;
 import com.ABCEnglish.entity.Exercises;
 import com.ABCEnglish.entity.Question;
 import com.ABCEnglish.entity.ResultExercises;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.ResultExerciseMapper;
-import com.ABCEnglish.reponsesitory.ExerciseRepository;
-import com.ABCEnglish.reponsesitory.QuestionRepository;
-import com.ABCEnglish.reponsesitory.ResultExerciseRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.ExerciseRepository;
+import com.ABCEnglish.repository.QuestionRepository;
+import com.ABCEnglish.repository.ResultExerciseRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

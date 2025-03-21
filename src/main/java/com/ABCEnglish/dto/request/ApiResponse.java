@@ -15,4 +15,9 @@ public class ApiResponse<T> {
 
     private String message;
     private T result;
+
+    public ApiResponse(T result) {
+        this.result = result;
+    }
+
 }

@@ -23,7 +23,7 @@ spring:
 #      maximum-pool-size: 10
 
   datasource:
-    url: jdbc:sqlserver://${DB_HOST:LAPTOP-TA5GL2KQ}:${DB_PORT:1433};databaseName=${DB_NAME:EducationSystem};encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://${DB_HOST:LAPMINTREES}:${DB_PORT:1433};databaseName=${DB_NAME:EducationSystem};encrypt=true;trustServerCertificate=true
     username: ${DB_USERNAME:sa}  # Biến môi trường cho tên người dùng CSDL
     password: ${DB_PASSWORD:12345678}  # Biến môi trường cho mật khẩu CSDL
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -38,7 +38,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         naming:
