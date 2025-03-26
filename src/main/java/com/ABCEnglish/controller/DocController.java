@@ -1,11 +1,13 @@
 package com.ABCEnglish.controller;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.DocDeleteResponse;
 import com.ABCEnglish.dto.response.DocResponse;
 import com.ABCEnglish.service.DocService;
+import com.ABCEnglish.service.TokenService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +27,19 @@ import java.text.ParseException;
 public class DocController {
 
     DocService docService;
+    JwtUtil jwtUtil;
+    private final TokenService tokenService;
 
     @PostMapping("/{lessonId}")
     public ApiResponse<DocResponse> addDoc(
             @RequestBody DocRequest request,
             @PathVariable Integer lessonId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        DocResponse result = docService.createDoc(lessonId,request,introspectRequest);
+         String token = authorizationHeader.startsWith("Bearer")
+                 ? authorizationHeader.substring("Bearer".length()).trim()
+                 : authorizationHeader;
+
+        DocResponse result = docService.createDoc(lessonId,request,token);
         return ApiResponse.<DocResponse>builder().result(result).build();
     }
 
@@ -45,11 +50,11 @@ public class DocController {
             @PathVariable Integer docId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
 
-        DocResponse result = docService.updateDoc(courseId,docId,request,introspectRequest);
+        DocResponse result = docService.updateDoc(courseId,docId,request,token);
         return ApiResponse.<DocResponse>builder().result(result).build();
     }
 
@@ -70,11 +75,11 @@ public class DocController {
             @PathVariable Integer docId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
 
-        DocResponse result = docService.getDoc(courseId,docId,introspectRequest);
+        DocResponse result = docService.getDoc(courseId,docId,token);
         return ApiResponse.<DocResponse>builder().result(result).build();
     }
     @DeleteMapping("/{courseId}/{docId}")
@@ -82,10 +87,11 @@ public class DocController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable Integer docId,
             @PathVariable Integer courseId) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return docService.deleteDoc(courseId,docId, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+
+        return docService.deleteDoc(courseId,docId, token);
     }
     
 }

@@ -36,16 +36,10 @@ public class ExerciseService {
     UserRepository userRepository;
     AuthenticationService authenticationService;
     UserService userService;
-    public ExerciseResponse createUser(Integer lessonId, ExerciseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    private final TokenService tokenService;
+
+    public ExerciseResponse createUser(Integer lessonId, ExerciseRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
@@ -59,16 +53,8 @@ public class ExerciseService {
         return exerciseMapper.exerciseResponse(exercises);
     }
 
-    public ExerciseResponse updateExercise( Integer lessonId,Integer exerciseId, ExerciseRequest request,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    public ExerciseResponse updateExercise( Integer lessonId,Integer exerciseId, ExerciseRequest request,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         Exercises exercise = exerciseRepository.findById(exerciseId)
@@ -88,10 +74,8 @@ public class ExerciseService {
         return exercise.map(exerciseMapper::exerciseResponse);
     }
 
-    public ExerciseResponse getExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ExerciseResponse getExercise(Integer lessonId, Integer exerciseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -101,15 +85,8 @@ public class ExerciseService {
         return exerciseMapper.exerciseResponse(exercise);
     }
 
-    public ExerciseDeleteResponse deleteExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-
+    public ExerciseDeleteResponse deleteExercise(Integer lessonId, Integer exerciseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 

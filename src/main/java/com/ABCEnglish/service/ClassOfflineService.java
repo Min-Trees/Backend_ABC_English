@@ -42,14 +42,11 @@ public class ClassOfflineService {
     ClassOfflineMapper classOfflineMapper;
     ClassOfflineRepository classOfflineRepository;
     ClassOfflineSessionRepository classOfflineSessionRepository;
+    private final TokenService tokenService;
 
-    public ClassOfflineResponse addClass(ClassOfflineRequest request, Integer courseId, IntrospectRequest token)
+    public ClassOfflineResponse addClass(ClassOfflineRequest request, Integer courseId, String token)
             throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+        User user = tokenService.getAdmin(token, true);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
@@ -106,13 +103,9 @@ public class ClassOfflineService {
         }
     }
 
-    public ClassOfflineResponse updateClassOffline(ClassOfflineRequest request, Integer classId, IntrospectRequest token)
+    public ClassOfflineResponse updateClassOffline(ClassOfflineRequest request, Integer classId, String token)
             throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
+        User user = tokenService.getAdmin(token,true);
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
 
@@ -182,34 +175,24 @@ public class ClassOfflineService {
         return sessions;
     }
 
-    public ClassOfflineResponse getClass(Integer classId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ClassOfflineResponse getClass(Integer classId, String token)  {
+        User user = tokenService.getUserFromToken(token);
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         return classOfflineMapper.classOfflineResponse(classOffline);
     }
 
-    public Page<ClassOfflineResponse> getAllClass(Integer courseId, Pageable pageable, IntrospectRequest token)
+    public Page<ClassOfflineResponse> getAllClass(Integer courseId, Pageable pageable, String token)
             throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = tokenService.getAdmin(token,true);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Page<ClassOffline> classList = classOfflineRepository.findAllByCourse(course, pageable);
         return classList.map(classOfflineMapper::classOfflineResponse);
     }
 
-    public ClassOfflineDeleteResponse deleteClassOffline(Integer classId, IntrospectRequest token)
-            throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ClassOfflineDeleteResponse deleteClassOffline(Integer classId, String token){
+        User user = tokenService.getAdmin(token,true);
         ClassOffline classOffline = classOfflineRepository.findById(classId)
                 .orElseThrow(() -> new AppException(ErrorCode.CLASS_NOT_FOUND));
         classOffline.setStatus(false);

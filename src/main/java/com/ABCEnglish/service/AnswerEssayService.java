@@ -40,11 +40,12 @@ public class AnswerEssayService {
     AnswerEssayRepository answerEssayRepository;
     @Autowired
     private GrammarCheckService grammarCheckService;
+    @Autowired
+    private TokenService tokenService;
+
     @Transactional
-    public AnswerEssayResponse createAnswerEssay(Integer questionId, AnswerEssayRequest request, IntrospectRequest token) throws ParseException, JOSEException, IOException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerEssayResponse createAnswerEssay(Integer questionId, AnswerEssayRequest request, String token) throws ParseException, JOSEException, IOException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
 

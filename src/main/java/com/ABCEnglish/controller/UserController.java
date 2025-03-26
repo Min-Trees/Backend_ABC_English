@@ -28,10 +28,10 @@ public class UserController {
     UserService userService;
     @GetMapping()
     public ResponseEntity<Page<UserResponse>> getAllUsers(Pageable pageable,@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        Page<UserResponse> result = userService.getAllUsers(pageable,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        Page<UserResponse> result = userService.getAllUsers(pageable,token);
         return ResponseEntity.ok(result);
     }
     @PostMapping()
@@ -58,10 +58,10 @@ public class UserController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @RequestBody UserRequest userRequest
     ) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        UserResponse result = userService.updateUser(userRequest,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        UserResponse result = userService.updateUser(userRequest,token);
         return ApiResponse.<UserResponse>builder().result(result).build();
     }
 
@@ -70,10 +70,10 @@ public class UserController {
     public ApiResponse<UserDeleteResponse> deleteUser(
             @PathVariable Integer userId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        UserDeleteResponse result = userService.deleteUser(userId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        UserDeleteResponse result = userService.deleteUser(userId,token);
         return ApiResponse.<UserDeleteResponse>builder().result(result).build();
     }
 
@@ -88,18 +88,18 @@ public class UserController {
     @GetMapping("/profile")
     public ApiResponse<UserResponse> getUser(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        UserResponse result = userService.getUser(introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        UserResponse result = userService.getUser(token);
         return ApiResponse.<UserResponse>builder().result(result).build();
     }
     @GetMapping("/admin/users")
     public ResponseEntity<Page<UserResponse>> getAllSocial(Pageable pageable, @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        Page<UserResponse> result = userService.getAllUsers(pageable,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        Page<UserResponse> result = userService.getAllUsers(pageable,token);
         return ResponseEntity.ok(result);
     }
     @PostMapping("/ban")
@@ -113,10 +113,10 @@ public class UserController {
             @PathVariable Integer userId,
             @RequestBody RoleUpdate roleId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        UserResponse result = userService.updatePermission(userId,introspectRequest,roleId.getRoleId());
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        UserResponse result = userService.updatePermission(userId,token,roleId.getRoleId());
         return ApiResponse.<UserResponse>builder().result(result).build();
     }
 }

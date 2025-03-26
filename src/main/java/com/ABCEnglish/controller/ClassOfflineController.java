@@ -1,11 +1,13 @@
 package com.ABCEnglish.controller;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.ClassOfflineRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.ClassOfflineDeleteResponse;
 import com.ABCEnglish.dto.response.ClassOfflineResponse;
 import com.ABCEnglish.service.ClassOfflineService;
+import com.ABCEnglish.service.TokenService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +33,10 @@ public class ClassOfflineController {
             @PathVariable Integer courseId,
             @RequestBody ClassOfflineRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader ) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        ClassOfflineResponse result = classOfflineService.addClass(request,courseId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        ClassOfflineResponse result = classOfflineService.addClass(request,courseId,token);
         return ApiResponse.<ClassOfflineResponse>builder().result(result).build();
     }
 
@@ -43,11 +45,10 @@ public class ClassOfflineController {
             @PathVariable Integer classId,
             @RequestBody ClassOfflineRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-
-        ClassOfflineResponse result = classOfflineService.updateClassOffline(request,classId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        ClassOfflineResponse result = classOfflineService.updateClassOffline(request,classId,token);
         return ApiResponse.<ClassOfflineResponse>builder().result(result).build();
     }
 
@@ -55,10 +56,10 @@ public class ClassOfflineController {
     public ApiResponse<ClassOfflineResponse> getClass(
             @PathVariable Integer classId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        ClassOfflineResponse result = classOfflineService.getClass(classId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        ClassOfflineResponse result = classOfflineService.getClass(classId,token);
         return ApiResponse.<ClassOfflineResponse>builder().result(result).build();
     }
 
@@ -67,10 +68,10 @@ public class ClassOfflineController {
             @PathVariable Integer courseId,
             Pageable pageable,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        Page<ClassOfflineResponse> classList = classOfflineService.getAllClass(courseId,pageable,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        Page<ClassOfflineResponse> classList = classOfflineService.getAllClass(courseId,pageable,token);
         return ResponseEntity.ok(classList);
     }
 
@@ -78,10 +79,10 @@ public class ClassOfflineController {
     public ClassOfflineDeleteResponse deleteClassOffline(
             @PathVariable Integer classId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return classOfflineService.deleteClassOffline(classId, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        return classOfflineService.deleteClassOffline(classId, token);
     }
 
 }

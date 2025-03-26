@@ -6,71 +6,55 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.crypto.spec.SecretKeySpec;
-
 @Configuration
 public class SecurityConfig {
+
+    @Value("${jwt.signerKey}")
+    private String signerKey;
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Value("${jwt.signerKey}")
-    private String signerKey;
-    private final JwtLoggingFilter jwtLoggingFilter;
 
-    public SecurityConfig(JwtLoggingFilter jwtLoggingFilter) {
-        this.jwtLoggingFilter = jwtLoggingFilter;
-    }
-    // Cấu hình phân quyền
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(request -> {
-            request.requestMatchers("/api/v1/auth/**").permitAll();
-            request.requestMatchers("/api/v1/verify/{token}").permitAll();
-            request.requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/course").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/document/{courseId}").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/exercise/{lessonId}").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/question/{exerciseId}").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/answer/{questionId}").permitAll();
-            request.requestMatchers(HttpMethod.GET, "/api/v1/lesson/{courseId}").permitAll();
-            request.anyRequest().authenticated();
-        });
-
-
-        // Thêm JwtLoggingFilter trước UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtLoggingFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // Cấu hình CORS và CSRF
-        http.csrf(AbstractHttpConfigurer::disable)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtLoggingFilter jwtLoggingFilter) throws Exception {
+        http
+                // Cấu hình phân quyền
+                .authorizeHttpRequests(authorize -> authorize
+                        // Cho phép truy cập không cần xác thực
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/verify/{token}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/course").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/document/{courseId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/exercise/{lessonId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/question/{exerciseId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/answer/{questionId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/lesson/{courseId}").permitAll()
+                        // Tất cả các request khác cần xác thực
+                        .anyRequest().authenticated()
+                )
+                // Thêm JwtLoggingFilter trước UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtLoggingFilter, UsernamePasswordAuthenticationFilter.class)
+                // Tắt CSRF và cấu hình CORS
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-        http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())));
-        return http.build(); // Kết thúc cấu hình và trả về SecurityFilterChain
+        // Không dùng oauth2ResourceServer vì JwtLoggingFilter đã xử lý token
+        return http.build();
     }
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -82,27 +66,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    // Cấu hình UserDetailsService (dùng dữ liệu mẫu)
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            // Tạo người dùng mẫu để thử nghiệm
-            if ("admin".equals(username)) {
-                return User.builder()
-                        .username("admin")
-                        .password(passwordEncoder().encode("admin123")) // Mật khẩu đã mã hóa
-                        .roles("admin") // Gán vai trò ADMIN
-                        .build();
-            } else if ("user".equals(username)) {
-                return User.builder()
-                        .username("user")
-                        .password(passwordEncoder().encode("user123")) // Mật khẩu đã mã hóa
-                        .roles("USER") // Gán vai trò USER
-                        .build();
-            }
-            throw new RuntimeException("User not found");
-        };
     }
 }

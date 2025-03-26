@@ -1,11 +1,13 @@
 package com.ABCEnglish.controller;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.ExerciseRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.ExerciseDeleteResponse;
 import com.ABCEnglish.dto.response.ExerciseResponse;
 import com.ABCEnglish.service.ExerciseService;
+import com.ABCEnglish.service.TokenService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +28,19 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExerciseController {
     ExerciseService exerciseService;
+    TokenService tokenService;
+    JwtUtil jwtUtil;
     @PostMapping("/{lessonId}")
     ApiResponse<ExerciseResponse> addExercise(
             @PathVariable Integer lessonId,
             @RequestBody ExerciseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
             ) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        ExerciseResponse result = exerciseService.createUser(lessonId,request,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+
+        ExerciseResponse result = exerciseService.createUser(lessonId,request,token);
         return ApiResponse.<ExerciseResponse>builder().result(result).build();
     }
 
@@ -46,10 +51,11 @@ public class ExerciseController {
             @RequestBody ExerciseRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
     ) throws ParseException, JOSEException{
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        ExerciseResponse result = exerciseService.updateExercise(lessonId,exerciseId,request,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+
+        ExerciseResponse result = exerciseService.updateExercise(lessonId,exerciseId,request,token);
         return ApiResponse.<ExerciseResponse>builder().result(result).build();
     }
 
@@ -64,10 +70,11 @@ public class ExerciseController {
             @PathVariable Integer exerciseId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader
     ) throws ParseException, JOSEException{
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        ExerciseResponse result = exerciseService.getExercise(lessonId,exerciseId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+
+        ExerciseResponse result = exerciseService.getExercise(lessonId,exerciseId,token);
         return ApiResponse.<ExerciseResponse>builder().result(result).build();
     }
 
@@ -76,9 +83,10 @@ public class ExerciseController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable Integer lessonId,
             @PathVariable Integer exerciseId) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return exerciseService.deleteExercise(lessonId,exerciseId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+
+        return exerciseService.deleteExercise(lessonId,exerciseId,token);
     }
 }

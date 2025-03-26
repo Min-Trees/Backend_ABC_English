@@ -42,11 +42,11 @@ public class ResultExerciseService {
     ResultExerciseRepository resultExerciseRepository;
     @Autowired
     ExerciseRepository exerciseRepository;
-    public ResultExerciseResponse createResult( Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // Kiểm tra người dùng tồn tại
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    @Autowired
+    private TokenService tokenService;
+
+    public ResultExerciseResponse createResult( Integer exerciseId, String token) {
+        User user = tokenService.getUserFromToken(token);
         Exercises exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
         List<Question> allQuestions = questionRepository.findByExercise_ExerciseId(exerciseId);
@@ -62,11 +62,8 @@ public class ResultExerciseService {
         resultExerciseRepository.save(result);
         return resultExerciseMapper.resultResponse(result);
     }
-    public ResultExerciseResponse getResult(Integer resultId,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // Kiểm tra người dùng tồn tại
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ResultExerciseResponse getResult(Integer resultId,String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
         ResultExercises response = resultExerciseRepository.findById(resultId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 

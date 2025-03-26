@@ -36,6 +36,8 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final AuthenticationService authenticationService;
+    private final TokenService tokenService;
+
     public UserResponse createUser(RegisterRequest request) throws MessagingException {
 
         Role role = roleRepository.findByName("guest")
@@ -61,11 +63,8 @@ public class UserService {
         userResponse.setToken(token);
         return userResponse;
     }
-    public UserResponse updateUser(UserRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public UserResponse updateUser(UserRequest request, String token) {
+        User user = tokenService.getUserFromToken(token);
         userMapper.updateUser(request,user);
         user.setUpdatedAt(new Date());
         User updateUser = userRepository.save(user);
@@ -80,25 +79,19 @@ public class UserService {
         return true;
     }
 
-    public UserResponse getUser(IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public UserResponse getUser(String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
         return userMapper.toUserResponse(user);
     }
 
-    public Page<UserResponse> getAllUsers(Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Role roleAdmin = roleRepository.findByName("admin")
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-        if (user.getRole().getName().equals(roleAdmin.getName())) {
+    public Page<UserResponse> getAllUsers(Pageable pageable, String token){
+        try {
+            User user = tokenService.getAdmin(token, true);
             Page<User> users = userRepository.findAll(pageable);
             return users.map(userMapper::toUserResponse);
+        } catch (AppException e){
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
-        throw new AppException(ErrorCode.FORBIDDEN);
     }
 
 
@@ -121,21 +114,10 @@ public class UserService {
         }
         return false;
     }
-    public boolean isAdmin(Integer userId) {
-        // Lấy thông tin User từ database
-        Optional<User> userOptional = userRepository.findById(userId);
 
-        // Kiểm tra vai trò ADMIN
-        return userOptional.isPresent() &&
-                "ADMIN".equalsIgnoreCase(userOptional.get().getRole().getName());
-    }
-
-    public UserDeleteResponse deleteUser(Integer userDeleteId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(isAdmin(userId)){
+    public UserDeleteResponse deleteUser(Integer userDeleteId, String token){
+        try {
+            User user = tokenService.getAdmin(token, true);
             User userDelete = userRepository.findById(userDeleteId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
             userDelete.setStatus(false);
@@ -144,26 +126,25 @@ public class UserService {
             response.setMessage("delete success");
             response.setStatus(true);
             return ApiResponse.<UserDeleteResponse>builder().result(response).build().getResult();
+        } catch (AppException e){
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
-        throw new AppException(ErrorCode.ACCESS_DENIED);
+
     }
 
-    public  UserResponse updatePermission(Integer userId, IntrospectRequest token, Integer roleId) throws ParseException, JOSEException {
-        Integer admin = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(admin)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(isAdmin(admin)){
+    public  UserResponse updatePermission(Integer userId, String token, Integer roleId) {
+        try {
+            User user = tokenService.getAdmin(token, true);
             User userUpdate = userRepository.findById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
             Role role = roleRepository.findById(roleId)
-                            .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
             userUpdate.setRole(role);
             userRepository.save(userUpdate);
             return userMapper.toUserResponse(userUpdate);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
-        throw new AppException(ErrorCode.ACCESS_DENIED);
-
     }
 
 

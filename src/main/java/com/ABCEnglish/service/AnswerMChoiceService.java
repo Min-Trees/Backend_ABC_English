@@ -34,15 +34,14 @@ public class AnswerMChoiceService {
     QuestionRepository questionRepository;
     @Autowired
     AnswerMChoiceRepository answerMChoiceRepository;
-    @Autowired
     AnswerMChoiceMapper answerMap;
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    private TokenService tokenService;
 
-    public AnswerMChoiceResponse createAnswerMChoice(Integer questionId, AnswerMChoiceRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse createAnswerMChoice(Integer questionId, AnswerMChoiceRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMap.toAnswerMchoice(request);
@@ -52,10 +51,8 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(answerMChoice);
     }
 
-    public AnswerMChoiceResponse updateAnswerMChoice(Integer questionId, Integer answerId, AnswerMChoiceRequest request,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse updateAnswerMChoice(Integer questionId, Integer answerId, AnswerMChoiceRequest request,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).
@@ -74,10 +71,8 @@ public class AnswerMChoiceService {
         return answerMChoices.map(answerMap::answerMChoiceResponse);
     }
 
-    public AnswerMChoiceResponse getAnswerMChoice(Integer questionId, Integer answerId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse getAnswerMChoice(Integer questionId, Integer answerId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).
@@ -86,10 +81,8 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(answerMChoice);
 
     }
-    public AnswerMChoiceDeleteResponse deleteAnswerMChoiceResponse(Integer questionId, Integer answerId,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceDeleteResponse deleteAnswerMChoiceResponse(Integer questionId, Integer answerId,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).

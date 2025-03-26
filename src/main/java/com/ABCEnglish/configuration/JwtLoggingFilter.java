@@ -1,5 +1,6 @@
 package com.ABCEnglish.configuration;
 
+import com.ABCEnglish.service.TokenService;
 import com.ABCEnglish.service.UserLogService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.FilterChain;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,38 +20,26 @@ import java.text.ParseException;
 @Component
 public class JwtLoggingFilter extends OncePerRequestFilter {
     @Autowired
-    UserLogService userLogService;
+    TokenService tokenService;
+    @Autowired
+    private JwtUtil jwtUtil;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         // Lấy token từ header Authorization
-        String authorizationHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7); // Bỏ chữ "Bearer "
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            String username = jwtUtil.extractUsername(token);
+
+            if (tokenService.isTokenValid(username, token) && !tokenService.isTokenBlacklisted(token)) {
+                // Xác thực thành công, tiếp tục request
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(username, null, null)
+                );
+            }
         }
-
-        // Lấy IP address
-        String ipAddress = request.getRemoteAddr();
-
-        // Lấy action (method và URI)
-        String method = request.getMethod();
-        String uri = request.getRequestURI();
-
-        // Log thông tin
-        System.out.println("User IP: " + ipAddress + ", Action: " + method + " " + uri +
-                (token != null ? ", Token: " + token : ", Token: Not Provided"));
-        try {
-            userLogService.saveLog(token != null ? token : "Not Provided", ipAddress, uri, method);
-        } catch (ParseException | JOSEException e) {
-            // Log lỗi
-            System.err.println("Error saving user log: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-
-        // Tiếp tục xử lý request
         filterChain.doFilter(request, response);
     }
 }

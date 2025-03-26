@@ -32,10 +32,10 @@ public class QuestionController {
             @RequestBody QuestionRequest questionRequest,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
 
-        String token =authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        QuestionResponse result =  questionService.createQuestion(exerciseId,questionRequest,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        QuestionResponse result =  questionService.createQuestion(exerciseId,questionRequest,token);
         return ApiResponse.<QuestionResponse>builder().result(result).build().getResult();
 
     }
@@ -45,10 +45,10 @@ public class QuestionController {
             @PathVariable Integer questionId,
             @RequestBody QuestionRequest questionRequest,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token =authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        QuestionResponse result = questionService.updateQuestion(exerciseId,questionId,questionRequest,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        QuestionResponse result = questionService.updateQuestion(exerciseId,questionId,questionRequest,token);
     return ApiResponse.<QuestionResponse>builder().result(result).build().getResult();
     }
 
@@ -75,9 +75,9 @@ public class QuestionController {
             @PathVariable Integer exerciseId,
             @PathVariable Integer questionId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        String token =authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return questionService.deleteQuestion(exerciseId,questionId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        return questionService.deleteQuestion(exerciseId,questionId,token);
     }
 }

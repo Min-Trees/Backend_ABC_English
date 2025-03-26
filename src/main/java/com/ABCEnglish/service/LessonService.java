@@ -39,12 +39,10 @@ public class LessonService {
     CourseRepository courseRepository;
     DocService docService;
     ExerciseService exerciseService;
-    public LessonResponse createdLesson(Integer courseId, LessonRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    private final TokenService tokenService;
+
+    public LessonResponse createdLesson(Integer courseId, LessonRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getAdmin(token,true);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
@@ -57,12 +55,8 @@ public class LessonService {
         return lessonMapper.lessonResponse(lesson);
     }
 
-    public LessonResponse updateLesson(Integer courseId, Integer lessonId,LessonRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    public LessonResponse updateLesson(Integer courseId, Integer lessonId,LessonRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token, true);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Lesson lesson = lessonRepository.findById(lessonId)
@@ -82,24 +76,16 @@ public class LessonService {
         return lessons.map(lessonMapper::lessonResponse);
     }
 
-    public LessonResponse getLesson(Integer courseId, Integer lessonId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    public LessonResponse getLesson(Integer courseId, Integer lessonId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         return lessonMapper.lessonResponse(lesson);
     }
-    public LessonDeleteResponse deleteLesson(Integer courseId, Integer lessonId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    public LessonDeleteResponse deleteLesson(Integer courseId, Integer lessonId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token, true);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         Lesson lesson = lessonRepository.findById(lessonId)
