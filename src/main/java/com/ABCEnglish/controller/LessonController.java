@@ -1,11 +1,13 @@
 package com.ABCEnglish.controller;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.LessonRequest;
 import com.ABCEnglish.dto.response.LessonDeleteResponse;
 import com.ABCEnglish.dto.response.LessonResponse;
 import com.ABCEnglish.service.LessonService;
+import com.ABCEnglish.service.TokenService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LessonController {
     LessonService lessonService;
+    private final TokenService tokenService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/{courseId}")
     public ApiResponse<LessonResponse> addLesson(
@@ -33,10 +37,10 @@ public class LessonController {
             @PathVariable Integer courseId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        LessonResponse result = lessonService.createdLesson(courseId,request,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        LessonResponse result = lessonService.createdLesson(courseId,request,token);
         return ApiResponse.<LessonResponse>builder().result(result).build();
 
     }
@@ -47,11 +51,10 @@ public class LessonController {
             @PathVariable Integer courseId,
             @PathVariable Integer lessonId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-
-        LessonResponse result = lessonService.updateLesson(courseId,lessonId,request,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        LessonResponse result = lessonService.updateLesson(courseId,lessonId,request,token);
         return ApiResponse.<LessonResponse>builder().result(result).build();
     }
 
@@ -65,11 +68,10 @@ public class LessonController {
             @PathVariable Integer courseId,
             @PathVariable Integer lessonId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-
-        LessonResponse result = lessonService.getLesson(courseId,lessonId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        LessonResponse result = lessonService.getLesson(courseId,lessonId,token);
         return ApiResponse.<LessonResponse>builder().result(result).build();
     }
 
@@ -79,9 +81,9 @@ public class LessonController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable Integer lessonId,
             @PathVariable Integer courseId) throws ParseException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return lessonService.deleteLesson(courseId,lessonId, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        return lessonService.deleteLesson(courseId,lessonId, token);
     }
 }

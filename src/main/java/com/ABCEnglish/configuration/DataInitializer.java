@@ -2,8 +2,9 @@ package com.ABCEnglish.configuration;
 
 import com.ABCEnglish.entity.Role;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.reponsesitory.RoleRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+
+import com.ABCEnglish.repository.RoleRepository;
+import com.ABCEnglish.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +34,7 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByPhone("admin").isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setFullname("Administrator");
+            admin.setFullName("Administrator");
             admin.setEmail("admin@example.com");
             admin.setPhone("admin");
             admin.setPassword(passwordEncoder.encode("password123")); // Mật khẩu mã hóa

@@ -3,10 +3,10 @@ package com.ABCEnglish.service;
 import com.ABCEnglish.dto.request.SearchRequest;
 import com.ABCEnglish.dto.response.SearchResult;
 import com.ABCEnglish.entity.Course;
-import com.ABCEnglish.reponsesitory.CourseRepository;
-import com.ABCEnglish.reponsesitory.DocRepository;
-import com.ABCEnglish.reponsesitory.ExerciseRepository;
-import com.ABCEnglish.reponsesitory.LessonRepository;
+import com.ABCEnglish.repository.CourseRepository;
+import com.ABCEnglish.repository.DocRepository;
+import com.ABCEnglish.repository.ExerciseRepository;
+import com.ABCEnglish.repository.LessonRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -59,7 +59,7 @@ public class SearchService {
                         course.getFee(),
                         course.getType().name(),      // Loại dữ liệu, ví dụ "IELTS", "TOEIC"
                         course.getDescription(),      // Mô tả khóa học
-                        course.getCreator().getFullname(), // Tên người tạo khóa học
+                        course.getCreator().getFullName(), // Tên người tạo khóa học
                         course.getCreatedAt()          // Ngày tạo khóa học
                 ));
     }

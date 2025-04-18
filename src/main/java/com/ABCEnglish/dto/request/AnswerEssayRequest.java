@@ -1,6 +1,5 @@
 package com.ABCEnglish.dto.request;
 
-import com.ABCEnglish.entity.Question;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

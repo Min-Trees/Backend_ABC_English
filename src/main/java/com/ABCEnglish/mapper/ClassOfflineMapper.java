@@ -15,6 +15,7 @@ import java.util.List;
 public interface ClassOfflineMapper {
 
     @Mapping(target = "dayOfWeekList", source = "dayOfWeekList")
+    @Mapping(source = "status", target = "status")
     ClassOffline toClassOffline(ClassOfflineRequest request);
 
     @Mapping(source = "classId", target = "classId")

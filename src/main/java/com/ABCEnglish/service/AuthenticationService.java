@@ -1,15 +1,16 @@
 package com.ABCEnglish.service;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.AuthenticationRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.ResetPasswordRequest;
 import com.ABCEnglish.dto.response.AuthenticationResponse;
 import com.ABCEnglish.dto.response.IntrospectResponse;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
-import com.ABCEnglish.reponsesitory.InvalidatedTokenRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
+import com.ABCEnglish.repository.InvalidatedTokenRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -21,10 +22,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -52,43 +55,44 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
+    private TokenService tokenService;
+    InvalidatedTokenRepository invalidatedTokenRepository;
+    private JwtUtil jwtUtil;
+    RedisTemplate<String, Object> redisTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final Map<String, String> verificationCodes = new HashMap<>();
 
-    @Autowired
-    InvalidatedTokenRepository invalidatedTokenRepository;
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws KeyLengthException {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        var user = userRepository
-                .findByPhone(request.getPhone())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(user.getBan24h())
-            throw new AppException(ErrorCode.ACCOUNT_BANED);
-        if(!user.getStatus())
-            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
-        boolean authenticate = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!authenticate){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-            // Truyền userId vào generateToken
 
+        public AuthenticationResponse authenticate(AuthenticationRequest request) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            var user = userRepository.findByPhone(request.getPhone())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+            if (Boolean.TRUE.equals(user.getBan24h())) {
+                throw new AppException(ErrorCode.ACCOUNT_BANED);
+            }
+            if (!user.getStatus()) {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
+            }
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+            long ttlInSeconds = jwtUtil.getRemainingTime(token);
+
+            // Lưu token vào Redis
+            tokenService.saveToken(user,token,ttlInSeconds);
+            logger.info("Token saved to Redis for user: {}", user.getPhone());
+
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .authenticated(true)
+                    .role(user.getRole())
+                    .userId(user.getUserId())
+                    .build();
         }
-        //Nếu tài khoản chưa được xác thực
-        if(!user.getStatus())
-        {
-            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFICATION);
-        }
-
-        // Nếu người dùng đã đăng nhập thành công, tạo token cho người dùng
-        var token = generateToken(user.getUserId());  // Truyền userId vào generateToken
-
-        // Trả về thông tin đăng nhập của người dùng (token, thông tin người dùng...)
-        return AuthenticationResponse.builder()
-                .token(token)
-                .authenticated(true)
-                .role(user.getRole())
-                .userId(user.getUserId())
-                .build();
-    }
     private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 

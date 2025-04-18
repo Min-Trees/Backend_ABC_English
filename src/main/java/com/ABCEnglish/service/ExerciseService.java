@@ -3,20 +3,17 @@ package com.ABCEnglish.service;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.ExerciseRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.response.DocDeleteResponse;
 import com.ABCEnglish.dto.response.ExerciseDeleteResponse;
 import com.ABCEnglish.dto.response.ExerciseResponse;
-import com.ABCEnglish.dto.response.LessonResponse;
 import com.ABCEnglish.entity.*;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.ExerciseMapper;
-import com.ABCEnglish.reponsesitory.ExerciseRepository;
-import com.ABCEnglish.reponsesitory.LessonRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.ExerciseRepository;
+import com.ABCEnglish.repository.LessonRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -39,16 +36,10 @@ public class ExerciseService {
     UserRepository userRepository;
     AuthenticationService authenticationService;
     UserService userService;
-    public ExerciseResponse createUser(Integer lessonId, ExerciseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    private final TokenService tokenService;
+
+    public ExerciseResponse createUser(Integer lessonId, ExerciseRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
@@ -62,16 +53,8 @@ public class ExerciseService {
         return exerciseMapper.exerciseResponse(exercises);
     }
 
-    public ExerciseResponse updateExercise( Integer lessonId,Integer exerciseId, ExerciseRequest request,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-        // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
+    public ExerciseResponse updateExercise( Integer lessonId,Integer exerciseId, ExerciseRequest request,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         Exercises exercise = exerciseRepository.findById(exerciseId)
@@ -91,10 +74,8 @@ public class ExerciseService {
         return exercise.map(exerciseMapper::exerciseResponse);
     }
 
-    public ExerciseResponse getExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public ExerciseResponse getExercise(Integer lessonId, Integer exerciseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -104,15 +85,8 @@ public class ExerciseService {
         return exerciseMapper.exerciseResponse(exercise);
     }
 
-    public ExerciseDeleteResponse deleteExercise(Integer lessonId, Integer exerciseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-
+    public ExerciseDeleteResponse deleteExercise(Integer lessonId, Integer exerciseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 

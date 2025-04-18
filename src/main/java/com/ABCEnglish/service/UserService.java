@@ -1,16 +1,15 @@
 package com.ABCEnglish.service;
 
-import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.request.RegisterRequest;
-import com.ABCEnglish.dto.request.StatusRequest;
+import com.ABCEnglish.dto.request.*;
+import com.ABCEnglish.dto.response.UserDeleteResponse;
 import com.ABCEnglish.dto.response.UserResponse;
 import com.ABCEnglish.entity.*;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.UserMapper;
-import com.ABCEnglish.reponsesitory.RoleRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
-import com.ABCEnglish.reponsesitory.VerificationTokenRepository;
+import com.ABCEnglish.repository.RoleRepository;
+import com.ABCEnglish.repository.UserRepository;
+import com.ABCEnglish.repository.VerificationTokenRepository;
 import com.nimbusds.jose.JOSEException;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -37,6 +36,8 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final AuthenticationService authenticationService;
+    private final TokenService tokenService;
+
     public UserResponse createUser(RegisterRequest request) throws MessagingException {
 
         Role role = roleRepository.findByName("guest")
@@ -62,6 +63,13 @@ public class UserService {
         userResponse.setToken(token);
         return userResponse;
     }
+    public UserResponse updateUser(UserRequest request, String token) {
+        User user = tokenService.getUserFromToken(token);
+        userMapper.updateUser(request,user);
+        user.setUpdatedAt(new Date());
+        User updateUser = userRepository.save(user);
+        return userMapper.toUserResponse(updateUser);
+    }
 
     public Boolean updateStatus(Integer userId,StatusRequest request){
         User user = userRepository.findById(userId)
@@ -71,25 +79,19 @@ public class UserService {
         return true;
     }
 
-    public UserResponse getUser(IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public UserResponse getUser(String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
         return userMapper.toUserResponse(user);
     }
 
-    public Page<UserResponse> getAllUsers(Pageable pageable, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Role roleAdmin = roleRepository.findByName("admin")
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-        if (user.getRole().getName().equals(roleAdmin.getName())) {
+    public Page<UserResponse> getAllUsers(Pageable pageable, String token){
+        try {
+            User user = tokenService.getAdmin(token, true);
             Page<User> users = userRepository.findAll(pageable);
             return users.map(userMapper::toUserResponse);
+        } catch (AppException e){
+            throw new AppException(ErrorCode.ACCESS_DENIED);
         }
-        throw new AppException(ErrorCode.FORBIDDEN);
     }
 
 
@@ -112,13 +114,37 @@ public class UserService {
         }
         return false;
     }
-    public boolean isAdmin(Integer userId) {
-        // Lấy thông tin User từ database
-        Optional<User> userOptional = userRepository.findById(userId);
 
-        // Kiểm tra vai trò ADMIN
-        return userOptional.isPresent() &&
-                "ADMIN".equalsIgnoreCase(userOptional.get().getRole().getName());
+    public UserDeleteResponse deleteUser(Integer userDeleteId, String token){
+        try {
+            User user = tokenService.getAdmin(token, true);
+            User userDelete = userRepository.findById(userDeleteId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            userDelete.setStatus(false);
+            UserDeleteResponse response = new UserDeleteResponse();
+            response.setUserId(userDeleteId);
+            response.setMessage("delete success");
+            response.setStatus(true);
+            return ApiResponse.<UserDeleteResponse>builder().result(response).build().getResult();
+        } catch (AppException e){
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+    }
+
+    public  UserResponse updatePermission(Integer userId, String token, Integer roleId) {
+        try {
+            User user = tokenService.getAdmin(token, true);
+            User userUpdate = userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            Role role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            userUpdate.setRole(role);
+            userRepository.save(userUpdate);
+            return userMapper.toUserResponse(userUpdate);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
     }
 
 

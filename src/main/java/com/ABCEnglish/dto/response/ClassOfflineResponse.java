@@ -23,6 +23,7 @@ public class ClassOfflineResponse {
     String description;
     LocalTime startTime;
     LocalTime endTime;
+    Boolean status;
     Date startDate;
     Date endDate;
     List<String> dayOfWeekList;

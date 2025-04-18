@@ -1,8 +1,8 @@
 package com.ABCEnglish.service;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.entity.VerifiTokenEntity;
-import com.ABCEnglish.reponsesitory.UserRepository;
-import com.ABCEnglish.reponsesitory.VerificationTokenRepository;
+import com.ABCEnglish.repository.UserRepository;
+import com.ABCEnglish.repository.VerificationTokenRepository;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

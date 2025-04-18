@@ -5,18 +5,15 @@ import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.AnswerMChoiceDeleteResponse;
 import com.ABCEnglish.dto.response.AnswerMChoiceResponse;
-import com.ABCEnglish.dto.response.ExerciseDeleteResponse;
-import com.ABCEnglish.dto.response.ExerciseResponse;
 import com.ABCEnglish.entity.AnswerMChoice;
-import com.ABCEnglish.entity.Exercises;
 import com.ABCEnglish.entity.Question;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.AnswerMChoiceMapper;
-import com.ABCEnglish.reponsesitory.AnswerMChoiceRepository;
-import com.ABCEnglish.reponsesitory.QuestionRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.AnswerMChoiceRepository;
+import com.ABCEnglish.repository.QuestionRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,15 +34,14 @@ public class AnswerMChoiceService {
     QuestionRepository questionRepository;
     @Autowired
     AnswerMChoiceRepository answerMChoiceRepository;
-    @Autowired
     AnswerMChoiceMapper answerMap;
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    private TokenService tokenService;
 
-    public AnswerMChoiceResponse createAnswerMChoice(Integer questionId, AnswerMChoiceRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse createAnswerMChoice(Integer questionId, AnswerMChoiceRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMap.toAnswerMchoice(request);
@@ -55,10 +51,8 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(answerMChoice);
     }
 
-    public AnswerMChoiceResponse updateAnswerMChoice(Integer questionId, Integer answerId, AnswerMChoiceRequest request,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse updateAnswerMChoice(Integer questionId, Integer answerId, AnswerMChoiceRequest request,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).
@@ -77,10 +71,8 @@ public class AnswerMChoiceService {
         return answerMChoices.map(answerMap::answerMChoiceResponse);
     }
 
-    public AnswerMChoiceResponse getAnswerMChoice(Integer questionId, Integer answerId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceResponse getAnswerMChoice(Integer questionId, Integer answerId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).
@@ -89,10 +81,8 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(answerMChoice);
 
     }
-    public AnswerMChoiceDeleteResponse deleteAnswerMChoiceResponse(Integer questionId, Integer answerId,IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AnswerMChoiceDeleteResponse deleteAnswerMChoiceResponse(Integer questionId, Integer answerId,String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
         AnswerMChoice answerMChoice = answerMChoiceRepository.findById(answerId).

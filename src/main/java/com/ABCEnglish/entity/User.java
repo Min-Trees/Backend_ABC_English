@@ -22,7 +22,7 @@ public class User {
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String username;
     @Column(name = "fullname")
-    private String fullname;
+    private String fullName;
     @Column(name = "email")
     private String email;
     @Column(name = "phone", unique = true)
@@ -42,7 +42,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date updatedAt;
 
-    @Column(name = "ban_24h")
+    @Column(name = "ban_24h", columnDefinition = "BIT DEFAULT 0")
     private Boolean ban24h = false;
 
     @Column(name = "ban_until")

@@ -1,5 +1,6 @@
 package com.ABCEnglish.service;
 
+import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.CourseRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
@@ -8,15 +9,18 @@ import com.ABCEnglish.dto.response.CourseResponse;
 import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.CourseOfUser;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.CourseMapper;
-import com.ABCEnglish.reponsesitory.CourseOfUserRepository;
-import com.ABCEnglish.reponsesitory.CourseRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.repository.CourseOfUserRepository;
+import com.ABCEnglish.repository.CourseRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,24 +39,25 @@ public class CourseService {
     private final CourseOfUserRepository courseOfUserRepository;
     private final UserService userService;
     private final LessonService lessonService;
+    private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private TokenService tokenService;
 
-    public CourseResponse createCourse(CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+    // sua xong create course
+    public CourseResponse createCourse(CourseRequest request, String token) throws ParseException, JOSEException {
         // Lấy userId từ token
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        System.out.println(authenticationService.introspectToken(token).getUserId());
 
         // Kiểm tra người dùng tồn tại
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
+        User user = tokenService.getAdmin(token,true);
+        Course course;
+        try {
+            course = courseMapper.toCourse(request);
+            course.setCreator(user);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         }
-        System.out.println(userRepository.findById(userId));
-        // Ánh xạ từ CourseRequest sang Course
-        Course course = courseMapper.toCourse(request);
-        course.setCreator(user);
-        // Tìm người dùng từ ID và gán vào Course
 
         if (request.getTeacher() != null) {
             User teacher = userRepository.findById(request.getTeacher().getUserId())
@@ -62,33 +67,20 @@ public class CourseService {
         }
         course.setCreatedAt(new Date());
         course.setUpdatedAt(new Date());
-        // Lưu đối tượng Course vào cơ sở dữ liệu
         courseRepository.save(course);
-        // Trả về đối tượng CourseResponse
         return courseMapper.courseResponse(course);
     }
 
-    public CourseResponse updateCourse(Integer courseId,CourseRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        // lay userId tu token duoc giai ma
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra xem user co ton tai hay khong
-        User user =  userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
-        // kiem tra xem nguoi tao co phai nguoi sua khong
+    public CourseResponse updateCourse(Integer courseId,CourseRequest request, String token) throws ParseException, JOSEException {
+       User user = tokenService.getAdmin(token,true);
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
         courseMapper.updatedCourse(request,course);
-        // cap nhat nguoi tao
         course.setCreator(user);
         if (request.getTeacher() != null) {
             User teacher = userRepository.findById(request.getTeacher().getUserId())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-            // cap nhat giao vien
             course.setTeacher(teacher);
         }
         course.setUpdatedAt(new Date());
@@ -103,23 +95,15 @@ public class CourseService {
         return courses.map(courseMapper::courseResponse);
     }
 
-    public CourseResponse getCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public CourseResponse getCourse(Integer courseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         return courseMapper.courseResponse(course);
     }
 
-    public CourseDeleteResponse deleteCourse(Integer courseId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+    public CourseDeleteResponse deleteCourse(Integer courseId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getAdmin(token,true);
         Course course = courseRepository.findByCourseIdAndCreator(courseId, user)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
@@ -131,13 +115,9 @@ public class CourseService {
         lessonService.deleteAllLessonByCourse(course);
         return ApiResponse.<CourseDeleteResponse>builder().result(courseDeleteResponse).build().getResult();
     }
-    public Page<CourseResponse> getCoursesByUser(IntrospectRequest token, Pageable pageable) throws ParseException, JOSEException {
+    public Page<CourseResponse> getCoursesByUser(String token, Pageable pageable) throws ParseException, JOSEException {
         // Lấy userId từ token
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-
-        // Kiểm tra người dùng có tồn tại hay không
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = tokenService.getUserFromToken(token);
 
         // Lấy danh sách các bản ghi CourseOfUser
         Page<CourseOfUser> courseOfUsers = courseOfUserRepository.findAllByUser(user, pageable);

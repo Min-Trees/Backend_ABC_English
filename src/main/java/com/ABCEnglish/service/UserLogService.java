@@ -1,15 +1,12 @@
 package com.ABCEnglish.service;
 
 import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.response.UserResponse;
-import com.ABCEnglish.entity.User;
 import com.ABCEnglish.entity.UserLog;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
-import com.ABCEnglish.reponsesitory.UserLogRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
+import com.ABCEnglish.repository.UserLogRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

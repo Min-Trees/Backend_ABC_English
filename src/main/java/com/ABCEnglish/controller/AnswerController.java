@@ -38,11 +38,10 @@ public class AnswerController {
             @PathVariable Integer questionId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
 
-        String token = authorizationHeader.substring("Bearer".length());
-        System.out.println(token);
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        AnswerMChoiceResponse result = answerMChoiceService.createAnswerMChoice(questionId, request, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        AnswerMChoiceResponse result = answerMChoiceService.createAnswerMChoice(questionId, request, token);
         return ApiResponse.<AnswerMChoiceResponse>builder().result(result).build();
     }
 
@@ -53,10 +52,10 @@ public class AnswerController {
             @PathVariable Integer answerId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        AnswerMChoiceResponse result = answerMChoiceService.updateAnswerMChoice(questionId, answerId, request, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        AnswerMChoiceResponse result = answerMChoiceService.updateAnswerMChoice(questionId, answerId, request, token);
 
         return ApiResponse.<AnswerMChoiceResponse>builder().result(result).build();
     }
@@ -67,10 +66,10 @@ public class AnswerController {
             @PathVariable Integer answerId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException{
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        AnswerMChoiceResponse result = answerMChoiceService.getAnswerMChoice(questionId,answerId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        AnswerMChoiceResponse result = answerMChoiceService.getAnswerMChoice(questionId,answerId,token);
         return ApiResponse.<AnswerMChoiceResponse>builder().result(result).build();
     }
 
@@ -87,10 +86,10 @@ public class AnswerController {
             @PathVariable Integer answerId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
 
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return answerMChoiceService.deleteAnswerMChoiceResponse(questionId,answerId,introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        return answerMChoiceService.deleteAnswerMChoiceResponse(questionId,answerId,token);
     }
 
     @PostMapping("/{questionId}/submit")
@@ -98,10 +97,10 @@ public class AnswerController {
             @PathVariable Integer questionId,
             @RequestBody AnswerEssayRequest request,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, IOException, JOSEException {
-        String token = authorizationHeader.substring("Bearer".length());
-        IntrospectRequest introspectRequest = new IntrospectRequest();
-        introspectRequest.setToken(token);
-        return answerEssayService.createAnswerEssay(questionId, request, introspectRequest);
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        return answerEssayService.createAnswerEssay(questionId, request, token);
     }
 }
 

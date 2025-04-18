@@ -5,8 +5,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}  # Biến môi trường cho tên người dùng email
-    password: ${MAIL_PASSWORD}  # Biến môi trường cho mật khẩu email
+    username: ${MAIL_USERNAME:npminhtri.be@gmail.com}  # Biến môi trường cho tên người dùng email
+    password: ${MAIL_PASSWORD:cfubhnaxnbdzsnta}       # Biến môi trường cho mật khẩu email
     properties:
       mail:
         smtp:
@@ -14,31 +14,23 @@ spring:
           starttls:
             enable: true
 
-#  datasource:
-#    url: jdbc:sqlserver://${DB_HOST:abcEnglish.mssql.somee.com}:${DB_PORT:1433};databaseName=${DB_NAME:abcEnglish};encrypt=true;trustServerCertificate=true
-#    username: ${DB_USERNAME:MinTrees_SQLLogin_1}  # Biến môi trường cho tên người dùng CSDL
-#    password: ${DB_PASSWORD:12345678}  # Biến môi trường cho mật khẩu CSDL
-#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#    hikari:
-#      maximum-pool-size: 10
-
   datasource:
-    url: jdbc:sqlserver://${DB_HOST:LAPTOP-TA5GL2KQ}:${DB_PORT:1433};databaseName=${DB_NAME:EducationSystem};encrypt=true;trustServerCertificate=true
-    username: ${DB_USERNAME:sa}  # Biến môi trường cho tên người dùng CSDL
-    password: ${DB_PASSWORD:12345678}  # Biến môi trường cho mật khẩu CSDL
+    url: jdbc:sqlserver://${DB_HOST:LAPMINTREES}:${DB_PORT:1433};databaseName=${DB_NAME:EducationSystem};encrypt=true;trustServerCertificate=true
+    username: ${DB_USERNAME:sa}                        # Biến môi trường cho tên người dùng CSDL
+    password: ${DB_PASSWORD:12345678}                  # Biến môi trường cho mật khẩu CSDL
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     hikari:
       maximum-pool-size: 10
 
   servlet:
     multipart:
-      max-file-size: ${MAX_FILE_SIZE:10MB}  # Biến môi trường cho kích thước tệp tối đa
-      max-request-size: ${MAX_REQUEST_SIZE:10MB}  # Biến môi trường cho kích thước yêu cầu tối đa
+      max-file-size: ${MAX_FILE_SIZE:10MB}             # Biến môi trường cho kích thước tệp tối đa
+      max-request-size: ${MAX_REQUEST_SIZE:10MB}       # Biến môi trường cho kích thước yêu cầu tối đa
       enabled: true
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         naming:
@@ -51,13 +43,17 @@ spring:
     converters:
       preferred-json-mapper: jackson
 
+  data:
+    redis:
+      url: ${REDIS_URL:redis://default:IXgrckkNwqxJObtnytJYFCRCUtLWnaXv@interchange.proxy.rlwy.net:49461}        # Database mặc định là 0
+
 jwt:
   signerKey: ${JWT_SIGNER_KEY:"1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"}  # Biến môi trường cho khóa ký JWT
-  valid-duration: ${JWT_VALID_DURATION:3600}  # Biến môi trường cho thời gian hợp lệ của JWT
-  refreshable-duration: ${JWT_REFRESHABLE_DURATION:36000}  # Biến môi trường cho thời gian làm mới JWT
+  valid-duration: ${JWT_VALID_DURATION:3600}          # Biến môi trường cho thời gian hợp lệ của JWT (giây)
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION:36000}  # Biến môi trường cho thời gian làm mới JWT (giây)
 
 vnpay:
-  tmn-code: ${VNPAY_TMN_CODE:FM2YJ74Z}  # Biến môi trường cho mã TMN của VNPay
+  tmn-code: ${VNPAY_TMN_CODE:FM2YJ74Z}                # Biến môi trường cho mã TMN của VNPay
   hash-secret: ${VNPAY_HASH_SECRET:M2NXGKZG9WNZ0X8HSRX56TFO6XMWCL75}  # Biến môi trường cho bí mật hash của VNPay
   url: ${VNPAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}  # Biến môi trường cho URL VNPay Sandbox
   return-url: ${VNPAY_RETURN_URL:http://localhost:8080/payment/vnpay_return}  # Biến môi trường cho URL trả về
