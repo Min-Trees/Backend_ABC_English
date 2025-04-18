@@ -8,13 +8,14 @@ import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.Doc;
 import com.ABCEnglish.entity.Lesson;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exceptioin.AppException;
-import com.ABCEnglish.exceptioin.ErrorCode;
+
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.DocMapper;
-import com.ABCEnglish.reponsesitory.CourseRepository;
-import com.ABCEnglish.reponsesitory.DocRepository;
-import com.ABCEnglish.reponsesitory.LessonRepository;
-import com.ABCEnglish.reponsesitory.UserRepository;
+
+import com.ABCEnglish.repository.DocRepository;
+import com.ABCEnglish.repository.LessonRepository;
+import com.ABCEnglish.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,19 +40,10 @@ public class DocService {
     LessonRepository lessonRepository;
     DocMapper docMapper;
     UserService userService;
-    public DocResponse createDoc(Integer lessonId,DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
+    TokenService tokenService;
+    public DocResponse createDoc(Integer lessonId,DocRequest request, String token) throws ParseException, JOSEException {
         // lay thong tin user tu token
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        // kiem tra su ton tai cua user
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
-            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
-        }
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+        User user = tokenService.getAdmin(token,true);
         // kiem tra su ton tai cua khoa hoc ( tai lieu thuoc khoa hoc )
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -68,17 +60,8 @@ public class DocService {
         return docMapper.docResponse(doc);
     }
 
-    public DocResponse updateDoc(Integer lessonId, Integer docId, DocRequest request, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
-        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3){
-            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
-            }
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+    public DocResponse updateDoc(Integer lessonId, Integer docId, DocRequest request, String token) throws ParseException, JOSEException {
+        User user = tokenService.getAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
@@ -100,10 +83,8 @@ public class DocService {
         return docs.map(docMapper::docResponse);
     }
 
-    public DocResponse getDoc(Integer lessonId, Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public DocResponse getDoc(Integer lessonId, Integer docId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getUserFromToken(token);
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
@@ -120,17 +101,8 @@ public class DocService {
     }
 
 
-    public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, IntrospectRequest token) throws ParseException, JOSEException {
-        Integer userId = authenticationService.introspectToken(token).getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if(user.getRole().getRoleId()!=2 && user.getRole().getRoleId()!=3) {
-            throw new AppException(ErrorCode.NOT_APPECT_ROLE);
-        }
-        boolean isAdmin = userService.isAdmin(userId);
-        if (!isAdmin) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+    public DocDeleteResponse deleteDoc(Integer lessonId,Integer docId, String token) throws ParseException, JOSEException {
+        User user = tokenService.getAdmin(token,true);
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
 
