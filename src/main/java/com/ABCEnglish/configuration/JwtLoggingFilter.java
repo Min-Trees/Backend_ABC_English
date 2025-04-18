@@ -33,7 +33,7 @@ public class JwtLoggingFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             String username = jwtUtil.extractUsername(token);
 
-            if (tokenService.isTokenValid(username, token) && !tokenService.isTokenBlacklisted(token)) {
+            if (tokenService.isTokenValid(username,token) && !tokenService.revokeToken(token)) {
                 // Xác thực thành công, tiếp tục request
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(username, null, null)

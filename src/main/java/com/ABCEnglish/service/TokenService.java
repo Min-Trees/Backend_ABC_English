@@ -1,46 +1,37 @@
 package com.ABCEnglish.service;
 import com.ABCEnglish.configuration.JwtUtil;
 import com.ABCEnglish.entity.User;
+import com.ABCEnglish.entity.VerifiTokenEntity;
 import com.ABCEnglish.exception.AppException;
 import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.repository.UserRepository;
+import com.ABCEnglish.repository.VerificationTokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
 
 @Service
 public class TokenService {
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
     private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
     private UserRepository userRepository;
-    public void validateToken(String username, String token) {
-        try {
-            // Kiểm tra token hợp lệ
-            if (!isTokenValid(username, token)) {
-                logger.warn("Token is invalid for username: {}", username);
-                throw new AppException(ErrorCode.UNEXPECTED_ERROR);
-            }
-            logger.info("Token is valid for username: {}", username);
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
 
-            // Kiểm tra token bị blacklist
-            if (isTokenBlacklisted(token)) {
-                logger.warn("Token is blacklisted: {}", token);
-                throw new AppException(ErrorCode.TOKEN_BLACKLISTED);
-            }
-            logger.info("Token is not blacklisted");
-
-        } catch (Exception e) {
-            logger.error("Error validating token: {}", e.getMessage(), e);
-            throw new AppException(ErrorCode.REDIS_CONNECTION_FAILED);  // Lỗi Redis hoặc lỗi khác
+    public void validateToken(String token) {
+        VerifiTokenEntity storedToken = verificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new AppException(ErrorCode.UNEXPECTED_ERROR));
+        if (storedToken.isRevoked() || storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            logger.warn("Token is invalid or expired: {}", token);
+            throw new AppException(ErrorCode.INVALID_TOKEN);
         }
+        logger.info("Token is valid: {}", token);
     }
 
     public User getTeacherOrAdmin(String token, boolean requireMaster) {
@@ -81,34 +72,55 @@ public class TokenService {
     }
 
     // Lưu token vào Redis với thời gian sống (TTL)
-    public void saveToken(String username, String token, long ttlInSeconds) {
-        redisTemplate.opsForValue().set("token:" + username, token, ttlInSeconds, TimeUnit.SECONDS);
+    public void saveToken(User user, String token, long ttlInSeconds) {
+        VerifiTokenEntity existingToken = verificationTokenRepository.findByUser(user);
+        if (existingToken != null) {
+            existingToken.setRevoked(true); // Vô hiệu hóa token cũ
+            verificationTokenRepository.save(existingToken);
+        }
+
+        // Tạo mới token và lưu vào database
+        VerifiTokenEntity verifiTokenEntity = new VerifiTokenEntity(user, token);
+        verifiTokenEntity.setExpiryDate(LocalDateTime.now().plusSeconds(ttlInSeconds));
+        verificationTokenRepository.save(verifiTokenEntity);
     }
 
     // Lấy token từ Redis
-    public String getToken(String username) {
-        return (String) redisTemplate.opsForValue().get("token:" + username);
+    public String getToken(String token) {
+        return verificationTokenRepository.findByToken(token)
+                .map(VerifiTokenEntity::getToken)
+                .orElse(null);
     }
 
     // Kiểm tra token có hợp lệ không
-    public boolean isTokenValid(String username, String token) {
-        String storedToken = getToken(username);
-        logger.info("Checking token for username: {}, storedToken: {}, providedToken: {}", username, storedToken, token);
-        return storedToken != null && storedToken.equals(token);
+    public boolean isTokenValid(String username,String token) {
+        User user = userRepository.findByPhone(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        VerifiTokenEntity verifiTokenEntity = verificationTokenRepository.findByUser(user);
+
+        if (verifiTokenEntity == null || verifiTokenEntity.isRevoked()) {
+            return false; // Token không tồn tại hoặc đã bị thu hồi
+        }
+
+        return verifiTokenEntity.getToken().equals(token) &&
+                verifiTokenEntity.getExpiryDate().isAfter(LocalDateTime.now());
     }
 
     // Xóa token (dùng khi logout)
-    public void deleteToken(String username) {
-        redisTemplate.delete("token:" + username);
+    public void cleanExpiredTokens() {
+        verificationTokenRepository.deleteAllByExpiryDateBefore(LocalDateTime.now());
+        logger.info("✅ Dọn dẹp các token hết hạn thành công!");
     }
 
-    // Blacklist token (nếu cần vô hiệu hóa token trước khi hết hạn)
-    public void blacklistToken(String token, long ttlInSeconds) {
-        redisTemplate.opsForValue().set("blacklist:" + token, "true", ttlInSeconds, TimeUnit.SECONDS);
+    // Thu hồi token (đăng xuất)
+    public boolean revokeToken(String token) {
+        verificationTokenRepository.findByToken(token).ifPresent(t -> {
+            t.setRevoked(true);
+            verificationTokenRepository.save(t);
+        });
+        return false;
     }
 
-    // Kiểm tra token có trong blacklist không
-    public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
-    }
+
 }

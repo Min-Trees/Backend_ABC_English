@@ -64,35 +64,35 @@ public class AuthenticationService {
     private final Map<String, String> verificationCodes = new HashMap<>();
 
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        var user = userRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        public AuthenticationResponse authenticate(AuthenticationRequest request) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            var user = userRepository.findByPhone(request.getPhone())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (Boolean.TRUE.equals(user.getBan24h())) {
-            throw new AppException(ErrorCode.ACCOUNT_BANED);
+            if (Boolean.TRUE.equals(user.getBan24h())) {
+                throw new AppException(ErrorCode.ACCOUNT_BANED);
+            }
+            if (!user.getStatus()) {
+                throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
+            }
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+            long ttlInSeconds = jwtUtil.getRemainingTime(token);
+
+            // Lưu token vào Redis
+            tokenService.saveToken(user,token,ttlInSeconds);
+            logger.info("Token saved to Redis for user: {}", user.getPhone());
+
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .authenticated(true)
+                    .role(user.getRole())
+                    .userId(user.getUserId())
+                    .build();
         }
-        if (!user.getStatus()) {
-            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
-        }
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
-
-        String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
-        long ttlInSeconds = jwtUtil.getRemainingTime(token);
-
-        // Lưu token vào Redis
-        redisTemplate.opsForValue().set("token:" + user.getPhone(), token, ttlInSeconds, TimeUnit.SECONDS);
-        logger.info("Token saved to Redis for user: {}", user.getPhone());
-
-        return AuthenticationResponse.builder()
-                .token(token)
-                .authenticated(true)
-                .role(user.getRole())
-                .userId(user.getUserId())
-                .build();
-    }
     private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
