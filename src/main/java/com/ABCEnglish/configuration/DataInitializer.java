@@ -7,11 +7,12 @@ import com.ABCEnglish.repository.RoleRepository;
 import com.ABCEnglish.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -22,7 +23,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Kiểm tra vai trò ADMIN đã tồn tại chưa
         Role adminRole = roleRepository.findByName("ADMIN")
                 .orElseGet(() -> {
                     Role role = new Role();
@@ -30,22 +30,21 @@ public class DataInitializer implements CommandLineRunner {
                     return roleRepository.save(role);
                 });
 
-        // Kiểm tra tài khoản admin đã tồn tại chưa
         if (userRepository.findByPhone("admin").isEmpty()) {
             User admin = new User();
             admin.setUsername("admin");
-            admin.setFullName("Administrator");
+            admin.setFullname("Administrator");
             admin.setEmail("admin@example.com");
             admin.setPhone("admin");
-            admin.setPassword(passwordEncoder.encode("password123")); // Mật khẩu mã hóa
+            admin.setPassword(passwordEncoder.encode("password123"));
             admin.setRole(adminRole);
-            admin.setStatus(true); // Trạng thái hoạt động
+            admin.setStatus(true);
             admin.setCreatedAt(new Date());
             admin.setUpdatedAt(new Date());
             userRepository.save(admin);
-            System.out.println("Admin account created successfully.");
+            System.out.println(" Admin account created successfully.");
         } else {
-            System.out.println("Admin account already exists.");
+            System.out.println(" Admin account already exists.");
         }
     }
 }

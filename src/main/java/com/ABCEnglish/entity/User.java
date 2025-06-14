@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Account")
+@Table(name = "users")
 @Data
 public class User {
 
@@ -17,21 +17,29 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "roleId", nullable = false)
     private Role role;
+
     @Column(name = "password")
     private String password;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+
+    @Column(name = "username", nullable = false)
     private String username;
+
     @Column(name = "fullname")
-    private String fullName;
+    private String fullname;
+
     @Column(name = "email")
     private String email;
+
     @Column(name = "phone", unique = true)
     private String phone;
+
     @Column(name = "description")
     private String description;
-    @Column(name = "level")
+
+    @Column(name = "user_level")
     private Integer level = 1;
-    @Column(name = "status")
+
+    @Column(name = "account_status")
     private Boolean status = false;
 
     @Column(name = "created_at", updatable = false)
@@ -42,7 +50,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date updatedAt;
 
-    @Column(name = "ban_24h", columnDefinition = "BIT DEFAULT 0")
+    @Column(name = "ban_24h")
     private Boolean ban24h = false;
 
     @Column(name = "ban_until")

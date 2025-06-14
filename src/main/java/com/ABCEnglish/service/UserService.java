@@ -104,7 +104,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Scheduled(fixedRate = 3600000) // Mỗi giờ kiểm tra
+    @Scheduled(initialDelay = 15000, fixedRate = 3600000) // Mỗi giờ kiểm tra
     public boolean resetBanStatus() {
         List<User> bannedUsers = userRepository.findAllByBan24hTrueAndBanUntilBefore(new Date());
         for (User user : bannedUsers) {

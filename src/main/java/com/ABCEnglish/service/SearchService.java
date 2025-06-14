@@ -55,11 +55,12 @@ public class SearchService {
 
         return courseRepository.findAll(specification, pageable)
                 .map(course -> new SearchResult(
+
                         course.getName(),
                         course.getFee(),
                         course.getType().name(),      // Loại dữ liệu, ví dụ "IELTS", "TOEIC"
                         course.getDescription(),      // Mô tả khóa học
-                        course.getCreator().getFullName(), // Tên người tạo khóa học
+                        course.getCreator().getFullname(), // Tên người tạo khóa học
                         course.getCreatedAt()          // Ngày tạo khóa học
                 ));
     }

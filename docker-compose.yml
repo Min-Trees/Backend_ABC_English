@@ -2,27 +2,40 @@ version: '3'
 
 services:
   app:
-    image: abc_english
+    build: .
     container_name: abc_english_container
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=EducationSystem;encrypt=true;trustServerCertificate=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=12345678
-    networks:
-      - app-network
-    depends_on:
-      - db
+      # SERVER
+      - PORT=8080
 
-  db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sql_server_container
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=12345678
-    ports:
-      - "1433:1433"
+      # MAIL
+      - MAIL_USERNAME=npminhtri.be@gmail.com
+      - MAIL_PASSWORD=cfubhnaxnbdzsnta
+
+      # DATABASE (PostgreSQL - sử dụng IP public)
+      - DB_HOST=34.58.204.162
+      - DB_PORT=5432
+      - DB_NAME=abcenglish
+      - DB_USERNAME=abcenglish
+      - DB_PASSWORD=25062024@Th
+
+      # FILE UPLOAD
+      - MAX_FILE_SIZE=10MB
+      - MAX_REQUEST_SIZE=10MB
+
+      # JWT
+      - JWT_SIGNER_KEY=1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij
+      - JWT_VALID_DURATION=3600
+      - JWT_REFRESHABLE_DURATION=36000
+
+      # VNPAY
+      - VNPAY_TMN_CODE=FM2YJ74Z
+      - VNPAY_HASH_SECRET=M2NXGKZG9WNZ0X8HSRX56TFO6XMWCL75
+      - VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      - VNPAY_RETURN_URL=http://localhost:8080/payment/vnpay_return
+
     networks:
       - app-network
 
