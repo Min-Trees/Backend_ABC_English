@@ -6,7 +6,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Question")
+@Table(name = "question")
 @Getter
 @Setter
 public class Question {
@@ -22,7 +22,7 @@ public class Question {
     @ManyToOne
     @JoinColumn(name = "creatorId", nullable = false)
     private User creator;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
     private java.math.BigDecimal score;
 

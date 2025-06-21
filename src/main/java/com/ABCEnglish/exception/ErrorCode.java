@@ -43,7 +43,7 @@ public enum ErrorCode {
     INVALID_TOKEN(1004, "Invalid token", HttpStatus.UNAUTHORIZED),
     TOKEN_BLACKLISTED(1004,"Token blacklisted",HttpStatus.UNAUTHORIZED),
     REDIS_CONNECTION_FAILED(1004,"Redis connection failed" , HttpStatus.INTERNAL_SERVER_ERROR ),
-    COURSE_CREATION_FAILED(1005,"Course creation failed" , HttpStatus.INTERNAL_SERVER_ERROR ),;
+    COURSE_CREATION_FAILED(1005,"Course creation failed" , HttpStatus.INTERNAL_SERVER_ERROR ), INTERNAL_SERVER_ERROR(400,"Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

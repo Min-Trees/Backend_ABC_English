@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "Social")
+@Table(name = "social")
 @Getter
 @Setter
 public class Social {
@@ -20,9 +20,9 @@ public class Social {
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private User user;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String title;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     @ElementCollection
     private Set<String> images;

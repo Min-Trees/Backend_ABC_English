@@ -5,7 +5,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Voice_Check")
+@Table(name = "voice_check")
 @Getter
 @Setter
 public class VoiceCheck {

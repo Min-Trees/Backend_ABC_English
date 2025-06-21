@@ -1,16 +1,19 @@
 package com.ABCEnglish.service;
 
-import com.ABCEnglish.dto.request.ApiResponse;
-import com.ABCEnglish.dto.request.IntrospectRequest;
-import com.ABCEnglish.dto.request.QuestionRequest;
+import com.ABCEnglish.dto.request.*;
+import com.ABCEnglish.dto.response.AnswerMChoiceResponse;
 import com.ABCEnglish.dto.response.QuestionDeleteResponse;
+import com.ABCEnglish.dto.response.QuestionWithAnswersResponse;
+import com.ABCEnglish.entity.AnswerMChoice;
 import com.ABCEnglish.entity.Exercises;
 import com.ABCEnglish.entity.Question;
 import com.ABCEnglish.dto.response.QuestionResponse;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exception.AppException;
 import com.ABCEnglish.exception.ErrorCode;
+import com.ABCEnglish.mapper.AnswerMChoiceMapper;
 import com.ABCEnglish.mapper.QuestionMapper;
+import com.ABCEnglish.repository.AnswerMChoiceRepository;
 import com.ABCEnglish.repository.ExerciseRepository;
 import com.ABCEnglish.repository.QuestionRepository;
 import com.ABCEnglish.repository.UserRepository;
@@ -24,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +40,71 @@ public class QuestionService {
     ExerciseRepository exerciseRepository;
     QuestionMapper questionMapper;
     private final TokenService tokenService;
+    AnswerMChoiceMapper answerMChoiceMapper;
+    AnswerMChoiceRepository answerMChoiceRepository;
+    private final AnswerMChoiceService answerMChoiceService;
 
+    public QuestionWithAnswersResponse getQuestionWithAnswer(Integer questionId, String token) {
+        try {
+            // Kiểm tra quyền
+            User user = tokenService.getTeacherOrAdmin(token, true);
+
+            // Lấy câu hỏi
+            Question question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
+
+            // Lấy danh sách câu trả lời
+            List<AnswerMChoiceResponse> answerMChoices = answerMChoiceService.getAllAnswersMChoice(questionId);
+
+            // Trả response
+            QuestionWithAnswersResponse response = new QuestionWithAnswersResponse();
+            response.setQuestion(questionMapper.questionResponse(question));
+            response.setAnswers(answerMChoices);
+            return response;
+
+        } catch (AppException e) {
+            // Ghi log lỗi nghiệp vụ rõ ràng
+            System.err.println("AppException: " + e.getErrorCode());
+            throw e; // Ném lại để controller xử lý
+        } catch (Exception e) {
+            // Lỗi hệ thống không xác định
+            System.err.println("Unexpected error: " + e.getMessage());
+            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public QuestionWithAnswersResponse createQuestionWithAnswer(Integer exerciseId, QuestionWithAnswersRequest questionRequest, String token) {
+        try{
+            User user = tokenService.getTeacherOrAdmin(token, true);
+            Exercises exercises = exerciseRepository.findById(exerciseId)
+                    .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
+            Question question = questionMapper.toQuestion(questionRequest.getQuestion());
+            question.setCreator(user);
+            question.setExercise(exercises);
+            questionRepository.save(question);
+            List<AnswerMChoiceResponse> answerResponses = new ArrayList<>();
+            if (questionRequest.getAnswers() != null) {
+                for (AnswerMChoiceRequest answerRequest : questionRequest.getAnswers()) {
+                    AnswerMChoice answer = answerMChoiceMapper.toAnswerMchoice(answerRequest);
+                    answer.setUser(user);
+                    answer.setQuestion(question);
+                    answerMChoiceRepository.save(answer);
+
+                    answerResponses.add(answerMChoiceMapper.answerMChoiceResponse(answer));
+                }
+            }
+
+            // Trả response tổng hợp
+            QuestionWithAnswersResponse response = new QuestionWithAnswersResponse();
+            response.setQuestion(questionMapper.questionResponse(question));
+            response.setAnswers(answerResponses);
+            return response;
+        }catch (AppException e) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+    }
     public QuestionResponse createQuestion(Integer exerciseId, QuestionRequest request, String token){
         try {
             User user = tokenService.getTeacherOrAdmin(token, true);
@@ -45,6 +114,7 @@ public class QuestionService {
             question.setCreator(user);
             question.setExercise(exercises);
             questionRepository.save(question);
+
             return questionMapper.questionResponse(question);
         } catch (AppException e) {
             throw new AppException(ErrorCode.ACCESS_DENIED);

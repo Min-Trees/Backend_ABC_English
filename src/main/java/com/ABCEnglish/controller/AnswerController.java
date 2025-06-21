@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -74,8 +75,8 @@ public class AnswerController {
     }
 
     @GetMapping("/{questionId}")
-    public ResponseEntity<Page<AnswerMChoiceResponse>> getAllQuestions(Pageable pageable, @PathVariable Integer questionId){
-        Page<AnswerMChoiceResponse> result = answerMChoiceService.getAllAnswersMChoice(pageable, questionId);
+    public ResponseEntity<List<AnswerMChoiceResponse>> getAllQuestions(@PathVariable Integer questionId){
+        List<AnswerMChoiceResponse> result = answerMChoiceService.getAllAnswersMChoice(questionId);
         return ResponseEntity.ok(result);
     }
 

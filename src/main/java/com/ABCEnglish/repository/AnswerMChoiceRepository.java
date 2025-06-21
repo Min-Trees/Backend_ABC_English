@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface AnswerMChoiceRepository extends JpaRepository<AnswerMChoice, Integer> {
-    Page<AnswerMChoice> findByQuestion_QuestionId(Pageable pageable, Integer questionId);
+    List<AnswerMChoice> findByQuestion_QuestionId(Integer questionId);
+
 }

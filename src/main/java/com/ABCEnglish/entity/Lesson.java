@@ -16,7 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Lesson")
+@Table(name = "lesson")
 @Getter
 @Setter
 public class Lesson {
@@ -35,9 +35,9 @@ public class Lesson {
 
     @Column(name = "lesson_index")
     private Integer lessonIndex;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String name;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     private Boolean status;
 

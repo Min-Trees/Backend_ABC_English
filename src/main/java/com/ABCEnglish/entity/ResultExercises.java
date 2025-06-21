@@ -15,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Result_exercises")
+@Table(name = "result_exercises")
 @Getter
 @Setter
 public class ResultExercises {

@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Type_docs")
+@Table(name = "type_docs")
 @Getter
 @Setter
 public class TypeDocs {

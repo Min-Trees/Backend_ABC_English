@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class AnswerMChoiceService {
     QuestionRepository questionRepository;
     @Autowired
     AnswerMChoiceRepository answerMChoiceRepository;
+    @Autowired
     AnswerMChoiceMapper answerMap;
     @Autowired
     AuthenticationService authenticationService;
@@ -63,12 +66,11 @@ public class AnswerMChoiceService {
         return answerMap.answerMChoiceResponse(updateAnswerMChoice);
     }
 
-    public Page<AnswerMChoiceResponse> getAllAnswersMChoice(Pageable pageable, Integer questionId){
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
-        // thuc hien phan trang
-        Page<AnswerMChoice> answerMChoices = answerMChoiceRepository.findByQuestion_QuestionId(pageable,questionId);
-        return answerMChoices.map(answerMap::answerMChoiceResponse);
+    public List<AnswerMChoiceResponse> getAllAnswersMChoice(Integer questionId) {
+        return answerMChoiceRepository.findByQuestion_QuestionId(questionId)
+                .stream()
+                .map(answer -> answerMap.answerMChoiceResponse(answer))
+                .collect(Collectors.toList());
     }
 
     public AnswerMChoiceResponse getAnswerMChoice(Integer questionId, Integer answerId, String token) throws ParseException, JOSEException {

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Documents")
+@Table(name = "documents")
 @Getter
 @Setter
 public class Doc {
@@ -19,11 +19,11 @@ public class Doc {
     @ManyToOne
     @JoinColumn(name = "creatorId")
     private User creator;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String name;
-    @Column(columnDefinition = "NVARCHAR(100)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
     private String url;
     private String images;
