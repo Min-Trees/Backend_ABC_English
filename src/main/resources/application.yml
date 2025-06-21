@@ -1,7 +1,10 @@
 server:
   port: ${PORT:8080}
+  address: 0.0.0.0
 
 spring:
+  config:
+    import: optional:dotenv:.env
   mail:
     host: smtp.gmail.com
     port: 587
@@ -49,7 +52,7 @@ spring:
       preferred-json-mapper: jackson
 
 jwt:
-  signerKey: ${JWT_SIGNER_KEY:default_signer}
+  signerKey:  ${JWT_SIGNER_KEY}
   valid-duration: ${JWT_VALID_DURATION:3600}
   refreshable-duration: ${JWT_REFRESHABLE_DURATION:36000}
 

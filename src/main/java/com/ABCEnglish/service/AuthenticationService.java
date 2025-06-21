@@ -26,20 +26,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,41 +54,36 @@ public class AuthenticationService {
     private TokenService tokenService;
     InvalidatedTokenRepository invalidatedTokenRepository;
     private JwtUtil jwtUtil;
-    RedisTemplate<String, Object> redisTemplate;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final Map<String, String> verificationCodes = new HashMap<>();
 
 
-        public AuthenticationResponse authenticate(AuthenticationRequest request) {
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-            var user = userRepository.findByPhone(request.getPhone())
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        var user = userRepository.findByPhone(request.getPhone())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-            if (Boolean.TRUE.equals(user.getBan24h())) {
-                throw new AppException(ErrorCode.ACCOUNT_BANED);
-            }
-            if (!user.getStatus()) {
-                throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
-            }
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                throw new AppException(ErrorCode.UNAUTHENTICATED);
-            }
-
-            String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
-            long ttlInSeconds = jwtUtil.getRemainingTime(token);
-
-            // Lưu token vào Redis
-            tokenService.saveToken(user,token,ttlInSeconds);
-            logger.info("Token saved to Redis for user: {}", user.getPhone());
-
-            return AuthenticationResponse.builder()
-                    .token(token)
-                    .authenticated(true)
-                    .role(user.getRole())
-                    .userId(user.getUserId())
-                    .build();
+        if (Boolean.TRUE.equals(user.getBan24h())) {
+            throw new AppException(ErrorCode.ACCOUNT_BANED);
         }
+        if (!user.getStatus()) {
+            throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFIED);
+        }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .role(user.getRole())
+                .userId(user.getUserId())
+                .build();
+    }
+
     private String generateToken(Integer userId) throws KeyLengthException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -137,22 +128,26 @@ public class AuthenticationService {
                 .build();
     }
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-
-        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
-
         SignedJWT signedJWT = SignedJWT.parse(token);
-        Date expiryTime = (isRefresh)
-                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
-                .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+        JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes(StandardCharsets.UTF_8));
+
+        // Lấy thời điểm hết hạn phù hợp
+        Date expiryTime = isRefresh
+                ? Date.from(Objects.requireNonNull(signedJWT.getJWTClaimsSet().getIssueTime())
+                .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS))
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        var verified = signedJWT.verify(jwsVerifier);
-        if(!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
-        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        // Xác minh chữ ký và thời gian
+        if (!signedJWT.verify(jwsVerifier)) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED); // Signature invalid
+        }
+        if (expiryTime.before(new Date())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED); // Token expired
+        }
 
         return signedJWT;
     }
+
     String sendVerificationEmail(User user, String token) throws MessagingException {
         if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new IllegalArgumentException("User or email cannot be null or empty");

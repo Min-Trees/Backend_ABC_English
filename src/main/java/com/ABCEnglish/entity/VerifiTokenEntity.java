@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -17,21 +18,20 @@ public class VerifiTokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String token;
-
-    @OneToOne
-    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
-    private boolean revoked = false;
+    @Column(nullable = false, unique = true)
+    private String token;
+
+    private boolean revoked;
 
     private LocalDateTime expiryDate;
+
     public VerifiTokenEntity(User user, String token) {
         this.user = user;
         this.token = token;
-        this.expiryDate = LocalDateTime.now().plusHours(24);
-        this.revoked = false;// 24-hour expiration
+        this.revoked = false;
     }
-
 }

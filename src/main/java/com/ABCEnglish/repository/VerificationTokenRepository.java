@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 @Repository
 public interface VerificationTokenRepository extends JpaRepository<VerifiTokenEntity, Long> {
     Optional<VerifiTokenEntity> findByToken(String token);
     void deleteAllByExpiryDateBefore(LocalDateTime now);
 
-    VerifiTokenEntity findByUser(User user);
+    List<VerifiTokenEntity> findByUser(User user);
 }
