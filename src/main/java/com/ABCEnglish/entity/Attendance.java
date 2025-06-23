@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.Date;
 
 @Entity
-@Table(name = "Attendance")
+@Table(name = "attendance")
 @Getter
 @Setter
 @Builder

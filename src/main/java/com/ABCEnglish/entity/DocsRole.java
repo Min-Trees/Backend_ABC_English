@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Docs_role")
+@Table(name = "docs_role")
 @Getter
 @Setter
 public class DocsRole {

@@ -5,7 +5,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Grammar_Check")
+@Table(name = "grammar_check")
 @Getter
 @Setter
 public class GrammarCheck {
@@ -17,7 +17,7 @@ public class GrammarCheck {
     @ManyToOne
     @JoinColumn(name = "questionId")
     private Question question;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String userText;
     private String correctText;
     private String errorJson;

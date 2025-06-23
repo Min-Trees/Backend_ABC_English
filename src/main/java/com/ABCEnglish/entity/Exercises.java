@@ -15,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Exercises")
+@Table(name = "exercises")
 @Getter
 @Setter
 public class Exercises {
@@ -30,9 +30,9 @@ public class Exercises {
     @ManyToOne
     @JoinColumn(name = "creatorId")
     private User creator;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String title;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "created_at", updatable = false)

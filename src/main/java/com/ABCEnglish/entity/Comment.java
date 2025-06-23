@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Entity
-@Table(name = "Comment")
+@Table(name = "comment")
 @Getter
 @Setter
 public class Comment {
@@ -24,7 +24,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "socialId", nullable = false)
     private Social social;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @ManyToOne

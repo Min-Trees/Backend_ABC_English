@@ -5,7 +5,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Answer_Essay")
+@Table(name = "answer_essay")
 @Getter
 @Setter
 public class AnswerEssay {
@@ -17,7 +17,7 @@ public class AnswerEssay {
     @ManyToOne
     @JoinColumn(name = "questionId")
     private Question question;
-    @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     @ManyToOne
     @JoinColumn(name = "userId")
