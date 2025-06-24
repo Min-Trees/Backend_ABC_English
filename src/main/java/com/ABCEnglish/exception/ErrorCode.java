@@ -45,6 +45,8 @@ public enum ErrorCode {
     REDIS_CONNECTION_FAILED(1004,"Redis connection failed" , HttpStatus.INTERNAL_SERVER_ERROR ),
     COURSE_CREATION_FAILED(1005,"Course creation failed" , HttpStatus.INTERNAL_SERVER_ERROR ),
     LIBRARY_NOT_FOUND(1005,"Library not found",HttpStatus.NOT_FOUND),
+    LIBRARY_ITEM_NOT_FOUND(1005,"Library item not found",HttpStatus.NOT_FOUND),
+
     INTERNAL_SERVER_ERROR(400,"Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -1,67 +1,82 @@
 package com.ABCEnglish.service;
 
-import com.ABCEnglish.dto.request.LibraryItemRequest;
-import com.ABCEnglish.dto.response.LibraryItemResponse;
-import com.ABCEnglish.entity.Library;
-import com.ABCEnglish.entity.LibraryItem;
+import com.ABCEnglish.dto.request.LibraryQuestionRequest;
+import com.ABCEnglish.dto.response.LibraryQuestionDeleteResponse;
+import com.ABCEnglish.dto.response.LibraryQuestionResponse;
+import com.ABCEnglish.entity.LibraryQuestion;
 import com.ABCEnglish.entity.User;
-import com.ABCEnglish.exception.AppException;
-import com.ABCEnglish.exception.ErrorCode;
-import com.ABCEnglish.mapper.LibraryItemMapper;
+import com.ABCEnglish.mapper.LibraryQuestionMapper;
 import com.ABCEnglish.repository.DocRepository;
-import com.ABCEnglish.repository.LibraryItemRepository;
+import com.ABCEnglish.repository.LibraryQuestionRepository;
 import com.ABCEnglish.repository.LibraryRepository;
 import com.ABCEnglish.repository.QuestionRepository;
-import com.nimbusds.jose.JOSEException;
 import lombok.AllArgsConstructor;
 
 
+import net.loomchild.segment.util.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class LibraryItemService {
     private final TokenService tokenService;
-    private final LibraryItemRepository libraryItemRepository;
-    private final QuestionRepository questionRepository;
-    private final DocRepository docRepository;
-    private final LibraryItemMapper libraryItemMapper;
-    private final LibraryRepository libraryRepository;
+    private final LibraryQuestionRepository libraryQuestionRepository;
+    private final LibraryQuestionMapper libraryQuestionMapper;
 
-    public LibraryItemResponse addItemToLibrary(LibraryItemRequest request, String token) throws ParseException, JOSEException {
-        if (tokenService != null) {
+    public LibraryQuestionResponse addQuestionToLibrary(LibraryQuestionRequest libraryQuestionRequest, String token) {
+        if(tokenService != null){
             User user = tokenService.getAdmin(token,true);
         }
-        if (libraryRepository != null) {
-            Library library = libraryRepository.findById(request.getLibraryId())
-                    .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_NOT_FOUND));
-        }
-        boolean itemExists = switch (request.getType()) {
-            case QUESTION -> questionRepository.existsById(request.getItemId());
-            case DOCUMENT -> docRepository.existsById(request.getItemId());
-        };
-        LibraryItem libraryItem = libraryItemMapper.toLibraryItemEntity(request);
-        libraryItem.setCreateAt(new Date());
-        libraryItem.setUpdateAt(new Date());
-        LibraryItem saved = libraryItemRepository.save(libraryItem);
+        LibraryQuestion libraryQuestion = libraryQuestionMapper.toEntity(libraryQuestionRequest);
+        libraryQuestion.setCreatedAt(new Date());
+        libraryQuestion.setUpdatedAt(new Date());
+        LibraryQuestion savedQuestion = libraryQuestionRepository.save(libraryQuestion);
+        return libraryQuestionMapper.toResponse(savedQuestion);
+    }
 
-        return libraryItemMapper.toResponse(saved);
+    public LibraryQuestionResponse updateQuestionToLibrary(Integer libraryQuestionId,LibraryQuestionRequest libraryQuestionRequest, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryQuestion libraryQuestion = libraryQuestionRepository.findById(libraryQuestionId)
+                .orElseThrow(()-> new ResourceNotFoundException("Library Question Not Found"));
+        libraryQuestion.setUpdatedAt(new Date());
+        LibraryQuestion updatedQuestion = libraryQuestionMapper.updateFromRequest(libraryQuestionRequest,libraryQuestion);
+        LibraryQuestion savedQuestion = libraryQuestionRepository.save(updatedQuestion);
+        return libraryQuestionMapper.toResponse(savedQuestion);
+    }
+
+    public LibraryQuestionResponse getQuestionFromLibrary(Integer libraryQuestionId, String token) {
+        if(tokenService != null){
+            User user = tokenService.getUserFromToken(token);
+        }
+        return libraryQuestionMapper.toResponse(libraryQuestionRepository.findById(libraryQuestionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Library Question Not Found")));
 
     }
-    public Page<LibraryItemResponse> getAllItems(Integer libraryId, Pageable pageable, String token) throws ParseException, JOSEException {
-        if (tokenService != null) {
+    public Page<LibraryQuestionResponse> getQuestionsFromLibrary(Integer libraryId, Pageable pageable, String token) {
+        if(tokenService != null){
             User user = tokenService.getAdmin(token,true);
         }
-        Page<LibraryItem> libraryItemList = libraryItemRepository.findByLibrary_LibraryId(libraryId,pageable);
-        return libraryItemList.map(libraryItemMapper::toResponse);
+        Page<LibraryQuestion> libraryQuestions = libraryQuestionRepository.findByLibrary_LibraryId(libraryId, pageable);
+        return libraryQuestions.map(libraryQuestionMapper::toResponse);
+    }
 
+    public LibraryQuestionDeleteResponse deleteQuestionFromLibrary(Integer libraryQuestionId, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryQuestion libraryQuestion = libraryQuestionRepository.findById(libraryQuestionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Library Question Not Found"));
+        LibraryQuestionDeleteResponse response = new LibraryQuestionDeleteResponse();
+        response.setLibraryId(libraryQuestion.getLibraryItemId());
+        response.setStatus(true);
+        response.setMessage("Success");
+        return response;
     }
 
 
