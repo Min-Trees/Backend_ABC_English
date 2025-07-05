@@ -2,6 +2,12 @@ server:
   port: ${PORT:8080}
   address: 0.0.0.0
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 spring:
   config:
     import: optional:dotenv:.env
@@ -16,7 +22,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -24,10 +29,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
-
   jpa:
     hibernate:
-      ddl-auto: update   # 👈 Sửa từ `create` ➜ `update` để giữ dữ liệu cũ (hoặc `create-drop` khi dev)
+      ddl-auto: update
     show-sql: true
     open-in-view: true
     properties:
@@ -36,17 +40,15 @@ spring:
         format_sql: true
         jdbc:
           lob:
-            non_contextual_creation: true  # 👈 Fix lỗi khi tạo bảng chứa kiểu TEXT hay BLOB
+            non_contextual_creation: true
         naming:
           physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
           implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-
   servlet:
     multipart:
       max-file-size: ${MAX_FILE_SIZE:10MB}
       max-request-size: ${MAX_REQUEST_SIZE:10MB}
       enabled: true
-
   mvc:
     converters:
       preferred-json-mapper: jackson

@@ -48,6 +48,13 @@ public class SecurityConfig {
             request.requestMatchers(HttpMethod.GET, "/api/v1/question/{exerciseId}").permitAll();
             request.requestMatchers(HttpMethod.GET, "/api/v1/answer/{questionId}").permitAll();
             request.requestMatchers(HttpMethod.GET, "/api/v1/lesson/{courseId}").permitAll();
+            request
+                    .requestMatchers(
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/v3/api-docs/**",
+                            "/api-docs/**"
+                    ).permitAll();
             request.anyRequest().authenticated();
         });
 
