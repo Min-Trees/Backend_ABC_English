@@ -1,6 +1,7 @@
 package com.ABCEnglish.repository;
 
 import com.ABCEnglish.entity.Question;
+import com.ABCEnglish.entity.QuestionTopic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> findByExercise_ExerciseId(Integer exerciseId);
     @Query(value = "SELECT COALESCE(SUM(score), 0) FROM Question WHERE exercise_id = :exerciseId AND status = true", nativeQuery = true)
     Double getTotalScoreByExerciseId(@Param("exerciseId") Integer exerciseId);
+    Page<Question> findByTopic(QuestionTopic topic, Pageable pageable);
 }

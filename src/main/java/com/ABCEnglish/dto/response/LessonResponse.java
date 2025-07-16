@@ -19,6 +19,8 @@ public class LessonResponse {
     Integer lessonIndex;
     String name;
     String content;
+    String topic;
+    Integer level;
     Boolean status;
     Date createdAt;
     Date updatedAt;

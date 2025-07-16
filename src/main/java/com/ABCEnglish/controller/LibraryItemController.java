@@ -1,8 +1,11 @@
 package com.ABCEnglish.controller;
 
+import com.ABCEnglish.dto.request.LibraryDocRequest;
 import com.ABCEnglish.dto.request.LibraryQuestionRequest;
+import com.ABCEnglish.dto.response.LibraryDocResponse;
 import com.ABCEnglish.dto.response.LibraryQuestionDeleteResponse;
 import com.ABCEnglish.dto.response.LibraryQuestionResponse;
+import com.ABCEnglish.entity.LibraryDoc;
 import com.ABCEnglish.service.LibraryItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +25,7 @@ import java.util.List;
 public class LibraryItemController {
     private final LibraryItemService libraryItemService;
 
-    @PostMapping("/add")
+    @PostMapping("/question")
     public LibraryQuestionResponse addLibraryItem(
             @RequestBody LibraryQuestionRequest libraryQuestionRequest,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader){
@@ -31,7 +34,16 @@ public class LibraryItemController {
                 : authorizationHeader;
         return libraryItemService.addQuestionToLibrary(libraryQuestionRequest,token);
     }
-
+    
+    @PostMapping("/doc")
+    public LibraryDocResponse addLibraryDoc(
+            @RequestBody LibraryDocRequest libraryDocRequest,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader){
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        return libraryItemService.addDocToLibrary(libraryDocRequest,token);
+    }
     @PutMapping("/update/{libraryQuestionId}")
     public LibraryQuestionResponse updateLibraryItem(
             @PathVariable Integer libraryQuestionId,
@@ -74,5 +86,14 @@ public class LibraryItemController {
         Pageable pageable = PageRequest.of(page, size);
         Page<LibraryQuestionResponse> responses = libraryItemService.getQuestionsFromLibrary(libraryId, pageable, token);
         return ResponseEntity.ok(responses);
+    }
+    @GetMapping("/get-doc/{libraryDocId}")
+    public LibraryDocResponse getLibraryDoc(
+            @PathVariable Integer libraryDocId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)String authorizationHeader){
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        return libraryItemService.getDoc(libraryDocId,token);
     }
 }

@@ -124,4 +124,16 @@ public class QuestionController {
                 authorizationHeader.substring(7) : authorizationHeader;
         return questionService.deleteQuestion(exerciseId,questionId,token);
     }
+    @GetMapping("/topic/{topic}")
+    public ApiResponse<Page<QuestionResponse>> getQuestionByTopic(
+            @PathVariable String topic,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            Pageable pageable){
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        Page<QuestionResponse> result = questionService.getQuestionByTopic(topic, pageable, token);
+        return ApiResponse.<Page<QuestionResponse>>builder().result(result).build();
+    }
+
 }

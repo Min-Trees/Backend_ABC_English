@@ -19,8 +19,8 @@ public class LibraryDoc {
     @ManyToOne
     @JoinColumn(name = "doc_id")
     private Doc doc;
-    private Date createAt;
-    private Date updateAt;
+    private Date createdAt;
+    private Date updatedAt;
     @ManyToOne
     private Library library;
 }

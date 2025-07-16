@@ -20,6 +20,8 @@ public class DocRequest {
      String url;
      String images;
      Doc.DocType type;
+     String topic;
+     Integer level;
      Boolean status;
      Boolean isFree;
 }

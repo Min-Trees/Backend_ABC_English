@@ -24,6 +24,8 @@ public class DocResponse {
       String url;
       String images;
       String type;
+      String topic;
+      Integer level;
       Boolean status;
       Boolean isFree;
       Date createdAt;

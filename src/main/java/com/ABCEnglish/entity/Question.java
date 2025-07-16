@@ -25,7 +25,8 @@ public class Question {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
     private java.math.BigDecimal score;
-
+    private QuestionTopic topic;
+    private Integer level;
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 

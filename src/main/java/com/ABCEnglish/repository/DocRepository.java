@@ -1,6 +1,7 @@
 package com.ABCEnglish.repository;
 
 import com.ABCEnglish.entity.Doc;
+import com.ABCEnglish.entity.DocTopic;
 import com.ABCEnglish.entity.Lesson;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,5 @@ public interface DocRepository extends JpaRepository<Doc, Integer>, JpaSpecifica
     @Query("SELECT d FROM Doc d WHERE d.lesson = :lesson AND d.status = true")
     Page<Doc> findAllByLesson(Lesson lesson, Pageable pageable);
     List<Doc> findAllByLesson(Lesson lesson);
+    Page<Doc> findByTopic(DocTopic topic, Pageable pageable);
 }
