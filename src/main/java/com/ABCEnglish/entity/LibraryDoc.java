@@ -21,6 +21,7 @@ public class LibraryDoc {
     private Doc doc;
     private Date createdAt;
     private Date updatedAt;
+    private boolean deleted;
     @ManyToOne
     private Library library;
 }

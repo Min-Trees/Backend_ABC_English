@@ -106,4 +106,27 @@ public class LibraryItemService {
                 .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
         return libraryDocMapper.toResponse(libraryDoc);
     }
+
+    public LibraryDocResponse updateDoc(Integer docId, LibraryDocRequest libraryDocRequest, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryDoc libraryDoc = libraryDocRepository.findById(docId)
+                .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
+        libraryDoc.setUpdatedAt(new Date());
+        libraryDocMapper.updateFromRequest(libraryDocRequest,libraryDoc);
+        LibraryDoc savedDoc = libraryDocRepository.save(libraryDoc);
+        return libraryDocMapper.toResponse(savedDoc);
+    }
+
+    public LibraryDocResponse deleteDoc(Integer docId, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryDoc libraryDoc = libraryDocRepository.findById(docId)
+                .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
+        libraryDoc.setDeleted(true);
+        return libraryDocMapper.toResponse(libraryDocRepository.save(libraryDoc));
+    }
+
 }

@@ -96,4 +96,23 @@ public class LibraryItemController {
                 : authorizationHeader;
         return libraryItemService.getDoc(libraryDocId,token);
     }
+    @PutMapping("/update-doc/{docId}")
+    public LibraryDocResponse updateLibraryDoc(
+            @PathVariable Integer docId,
+            @RequestBody LibraryDocRequest request,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)String authorizationHeader){
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        return libraryItemService.updateDoc(docId,request,token);
+    }
+    @DeleteMapping("/delete/{docId}")
+    public LibraryDocResponse deleteLibraryDoc(
+            @PathVariable Integer docId,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION)String authorizationHeader){
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        return libraryItemService.deleteDoc(docId,token);
+    }
 }

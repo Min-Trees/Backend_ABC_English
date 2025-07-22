@@ -16,6 +16,7 @@ public interface LibraryDocMapper {
     @Mapping(target = "doc.docId", source = "docId")
     @Mapping(target = "libraryItemId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     LibraryDoc toEntity(LibraryDocRequest request);
 
@@ -24,10 +25,11 @@ public interface LibraryDocMapper {
     @Mapping(target = "docType", source = "doc.type")
     LibraryDocResponse toResponse(LibraryDoc entity);
 
-    @Mapping(target = "library.libraryId", source = "request.libraryId")
-    @Mapping(target = "doc.docId", source = "request.docId")
+    @Mapping(target = "library", ignore = true)
+    @Mapping(target = "doc", ignore = true)
     @Mapping(target = "libraryItemDescription", source = "request.libraryItemDescription")
     @Mapping(target = "libraryItemId", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     LibraryDoc updateFromRequest(LibraryDocRequest request,LibraryDoc entity);
