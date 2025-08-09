@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/result")
@@ -42,6 +43,20 @@ public class ResultExerciseController {
                     : authorizationHeader;
             ResultExerciseResponse result = resultExerciseService.getResult(resultId, token);
             return ApiResponse.<ResultExerciseResponse>builder().result(result).build().getResult();
+        } catch (AppException e){
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+    }
+
+    @GetMapping("/exercise/{exerciseId}")
+    public List<ResultExerciseResponse> getResultsByExercise(@PathVariable Integer exerciseId,
+                                                            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        try {
+            String token = authorizationHeader.startsWith("Bearer")
+                    ? authorizationHeader.substring("Bearer".length()).trim()
+                    : authorizationHeader;
+            List<ResultExerciseResponse> result = resultExerciseService.getResultsByExercise(exerciseId, token);
+            return ApiResponse.<List<ResultExerciseResponse>>builder().result(result).build().getResult();
         } catch (AppException e){
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }

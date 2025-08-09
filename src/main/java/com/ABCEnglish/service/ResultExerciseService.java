@@ -1,9 +1,7 @@
 package com.ABCEnglish.service;
 
-import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.ResultExerciseResponse;
 import com.ABCEnglish.entity.Exercises;
-import com.ABCEnglish.entity.Question;
 import com.ABCEnglish.entity.ResultExercises;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exception.AppException;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +48,6 @@ public class ResultExerciseService {
         User user = tokenService.getUserFromToken(token);
         Exercises exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
-        List<Question> allQuestions = questionRepository.findByExercise_ExerciseId(exerciseId);
         Double totalScore = questionRepository.getTotalScoreByExerciseId(exerciseId);
 
         ResultExercises result = resultExerciseMapper.toResult(exerciseId);
@@ -68,5 +66,14 @@ public class ResultExerciseService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return resultExerciseMapper.resultResponse(response);
+    }
+
+    public List<ResultExerciseResponse> getResultsByExercise(Integer exerciseId, String token) {
+        User user = tokenService.getUserFromToken(token);
+        List<ResultExercises> results = resultExerciseRepository
+                .findByExercise_ExerciseIdAndUser_UserId(exerciseId, user.getUserId());
+        return results.stream()
+                .map(resultExerciseMapper::resultResponse)
+                .collect(Collectors.toList());
     }
 }
