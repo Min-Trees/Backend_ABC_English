@@ -1,41 +1,13 @@
-version: '3'
+version: '3.8'
 
 services:
   app:
     build: .
     container_name: abc_english_container
     ports:
-      - "8080:8080"
-    environment:
-      # SERVER
-      - PORT=8080
-
-      # MAIL
-      - MAIL_USERNAME=npminhtri.be@gmail.com
-      - MAIL_PASSWORD=cfubhnaxnbdzsnta
-
-      # DATABASE (PostgreSQL - sử dụng IP public)
-      - DB_HOST=34.58.204.162
-      - DB_PORT=5432
-      - DB_NAME=abcenglish
-      - DB_USERNAME=abcenglish
-      - DB_PASSWORD=25062024@Th
-
-      # FILE UPLOAD
-      - MAX_FILE_SIZE=10MB
-      - MAX_REQUEST_SIZE=10MB
-
-      # JWT
-      - JWT_SIGNER_KEY=1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij
-      - JWT_VALID_DURATION=3600
-      - JWT_REFRESHABLE_DURATION=36000
-
-      # VNPAY
-      - VNPAY_TMN_CODE=FM2YJ74Z
-      - VNPAY_HASH_SECRET=M2NXGKZG9WNZ0X8HSRX56TFO6XMWCL75
-      - VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      - VNPAY_RETURN_URL=http://localhost:8080/payment/vnpay_return
-
+      - "${PORT:-8080}:8080"
+    env_file:
+      - .env
     networks:
       - app-network
 

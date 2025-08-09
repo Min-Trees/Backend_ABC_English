@@ -9,6 +9,7 @@ import com.nimbusds.jose.KeyLengthException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,11 @@ public class AuthenticationController {
                 .build();
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        AuthenticationResponse response = authenticationService.refreshAccessToken(request.getRefreshToken());
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/token")
     ApiResponse<IntrospectResponse> introspectResponseApiResponse(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {

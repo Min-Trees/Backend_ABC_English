@@ -74,10 +74,12 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        String token = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+        String accessToken = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+        String refreshToken = generateRefreshToken(user.getUserId());
 
         return AuthenticationResponse.builder()
-                .token(token)
+                .token(accessToken)
+                .refreshToken(refreshToken)
                 .authenticated(true)
                 .role(user.getRole())
                 .userId(user.getUserId())
@@ -127,6 +129,31 @@ public class AuthenticationService {
                 .userId(userId)
                 .build();
     }
+    public AuthenticationResponse refreshAccessToken(String refreshToken) {
+        try {
+            SignedJWT signedJWT = verifyToken(refreshToken, true); // isRefresh = true
+            Integer userId = Integer.parseInt(signedJWT.getJWTClaimsSet().getSubject());
+
+            // Kiểm tra xem user có tồn tại không
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+            // Tạo lại accessToken mới
+            String newAccessToken = jwtUtil.generateToken(user.getPhone(), user.getUserId());
+
+            return AuthenticationResponse.builder()
+                    .token(newAccessToken)
+                    .refreshToken(refreshToken) // hoặc bạn có thể tạo refresh token mới
+                    .authenticated(true)
+                    .role(user.getRole())
+                    .userId(user.getUserId())
+                    .build();
+
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes(StandardCharsets.UTF_8));
@@ -165,6 +192,29 @@ public class AuthenticationService {
 
         return verificationUrl;
     }
+    private String generateRefreshToken(Integer userId) {
+        try {
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .subject(userId.toString())
+                    .issuer("Abc_english")
+                    .issueTime(new Date())
+                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
+                    .jwtID(UUID.randomUUID().toString())
+                    .claim("type", "refresh")
+                    .build();
+
+            JWSObject jwsObject = new JWSObject(
+                    new JWSHeader(JWSAlgorithm.HS512),
+                    new Payload(claimsSet.toJSONObject())
+            );
+
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes(StandardCharsets.UTF_8)));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Failed to generate refresh token", e);
+        }
+    }
+
 
     public String sendEmialResetPassword(String email)  {
         try {
