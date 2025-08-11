@@ -86,4 +86,18 @@ public class LessonController {
                 : authorizationHeader;
         return lessonService.deleteLesson(courseId,lessonId, token);
     }
+    @GetMapping("/topic/{topic}")
+    public ApiResponse<Page<LessonResponse>> getLessonByTopic(
+            @PathVariable String topic,
+            Pageable pageable,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
+        String token = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring("Bearer ".length()).trim()
+                : authorizationHeader;
+        Page<LessonResponse> result = lessonService.getLessonByTopic(topic,pageable, token);
+        return ApiResponse.<Page<LessonResponse>>builder()
+                .result(result)
+                .build();
+    }
+
 }

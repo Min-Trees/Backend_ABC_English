@@ -4,10 +4,7 @@ import com.ABCEnglish.dto.request.ApiResponse;
 import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.response.*;
-import com.ABCEnglish.entity.Course;
-import com.ABCEnglish.entity.Doc;
-import com.ABCEnglish.entity.Lesson;
-import com.ABCEnglish.entity.User;
+import com.ABCEnglish.entity.*;
 
 import com.ABCEnglish.exception.AppException;
 import com.ABCEnglish.exception.ErrorCode;
@@ -115,6 +112,13 @@ public class DocService {
         docDeleteResponse.setStatus(false);
         docDeleteResponse.setMessage("delete success");
         return ApiResponse.<DocDeleteResponse>builder().result(docDeleteResponse).build().getResult();
+    }
+
+    public Page<DocResponse> getDocByTopic(String topic, Pageable pageable, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token,true);
+        DocTopic docTopic = DocTopic.valueOf(topic.toUpperCase());
+        Page<Doc> docTopics = docRepository.findByTopic(docTopic,pageable);
+        return docTopics.map(docMapper::docResponse);
     }
 
     public void deleteDocsByLesson(Lesson lesson) {

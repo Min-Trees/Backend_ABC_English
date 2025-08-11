@@ -1,15 +1,18 @@
 package com.ABCEnglish.service;
 
+import com.ABCEnglish.dto.request.LibraryDocRequest;
 import com.ABCEnglish.dto.request.LibraryQuestionRequest;
+import com.ABCEnglish.dto.response.LibraryDocResponse;
 import com.ABCEnglish.dto.response.LibraryQuestionDeleteResponse;
 import com.ABCEnglish.dto.response.LibraryQuestionResponse;
+import com.ABCEnglish.entity.LibraryDoc;
 import com.ABCEnglish.entity.LibraryQuestion;
 import com.ABCEnglish.entity.User;
+import com.ABCEnglish.exception.AppException;
+import com.ABCEnglish.exception.ErrorCode;
+import com.ABCEnglish.mapper.LibraryDocMapper;
 import com.ABCEnglish.mapper.LibraryQuestionMapper;
-import com.ABCEnglish.repository.DocRepository;
-import com.ABCEnglish.repository.LibraryQuestionRepository;
-import com.ABCEnglish.repository.LibraryRepository;
-import com.ABCEnglish.repository.QuestionRepository;
+import com.ABCEnglish.repository.*;
 import lombok.AllArgsConstructor;
 
 
@@ -26,6 +29,8 @@ public class LibraryItemService {
     private final TokenService tokenService;
     private final LibraryQuestionRepository libraryQuestionRepository;
     private final LibraryQuestionMapper libraryQuestionMapper;
+    private final LibraryDocMapper libraryDocMapper;
+    private final LibraryDocRepository libraryDocRepository;
 
     public LibraryQuestionResponse addQuestionToLibrary(LibraryQuestionRequest libraryQuestionRequest, String token) {
         if(tokenService != null){
@@ -79,5 +84,49 @@ public class LibraryItemService {
         return response;
     }
 
+
+    public LibraryDocResponse addDocToLibrary(LibraryDocRequest libraryDocRequest, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+
+        }
+        LibraryDoc libraryDoc = libraryDocMapper.toEntity(libraryDocRequest);
+        libraryDoc.setCreatedAt(new Date());
+        libraryDoc.setUpdatedAt(new Date());
+        LibraryDoc saveDoc = libraryDocRepository.save(libraryDoc);
+        return libraryDocMapper.toResponse(saveDoc);
+    }
+
+    public LibraryDocResponse getDoc(Integer libraryDocId, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+
+        LibraryDoc libraryDoc = libraryDocRepository.findById(libraryDocId)
+                .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
+        return libraryDocMapper.toResponse(libraryDoc);
+    }
+
+    public LibraryDocResponse updateDoc(Integer docId, LibraryDocRequest libraryDocRequest, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryDoc libraryDoc = libraryDocRepository.findById(docId)
+                .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
+        libraryDoc.setUpdatedAt(new Date());
+        libraryDocMapper.updateFromRequest(libraryDocRequest,libraryDoc);
+        LibraryDoc savedDoc = libraryDocRepository.save(libraryDoc);
+        return libraryDocMapper.toResponse(savedDoc);
+    }
+
+    public LibraryDocResponse deleteDoc(Integer docId, String token) {
+        if(tokenService != null){
+            User user = tokenService.getAdmin(token,true);
+        }
+        LibraryDoc libraryDoc = libraryDocRepository.findById(docId)
+                .orElseThrow(() -> new AppException(ErrorCode.LIBRARY_ITEM_NOT_FOUND));
+        libraryDoc.setDeleted(true);
+        return libraryDocMapper.toResponse(libraryDocRepository.save(libraryDoc));
+    }
 
 }

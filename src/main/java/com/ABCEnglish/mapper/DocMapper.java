@@ -1,16 +1,17 @@
 package com.ABCEnglish.mapper;
 
-import com.ABCEnglish.dto.request.CourseRequest;
 import com.ABCEnglish.dto.request.DocRequest;
 import com.ABCEnglish.dto.response.DocResponse;
-import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.Doc;
+import com.ABCEnglish.entity.DocTopic;
+import com.ABCEnglish.entity.LessonTopic;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DocMapper  {
+    @Mapping(target = "topic", expression = "java(mapStringToTopic(request.getTopic()))")
     Doc toDoc(DocRequest request);
     @Mapping(source = "docId", target = "docId") // Mapping docId
     @Mapping(source = "creator.userId", target = "creator")
@@ -18,6 +19,14 @@ public interface DocMapper  {
     @Mapping(source = "createdAt", target = "createdAt") // Mapping createdAt
     @Mapping(source = "updatedAt", target = "updatedAt") // Mapping updatedAt
     DocResponse docResponse(Doc doc);
-
+    @Mapping(target = "topic", expression = "java(mapStringToTopic(request.getTopic()))")
     void updateDoc(DocRequest request, @MappingTarget Doc doc);
+    default DocTopic mapStringToTopic(String topicName) {
+        if (topicName == null) return null;
+        try {
+            return DocTopic.valueOf(topicName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid topic name: " + topicName);
+        }
+    }
 }

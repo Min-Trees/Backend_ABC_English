@@ -1,6 +1,5 @@
 package com.ABCEnglish.entity;
 
-import com.ABCEnglish.entity.Course;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,6 +39,8 @@ public class Lesson {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     private Boolean status;
+    private LessonTopic topic;
+    private Integer level;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

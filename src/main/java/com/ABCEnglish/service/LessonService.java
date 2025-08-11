@@ -5,8 +5,10 @@ import com.ABCEnglish.dto.request.IntrospectRequest;
 import com.ABCEnglish.dto.request.LessonRequest;
 import com.ABCEnglish.dto.response.LessonDeleteResponse;
 import com.ABCEnglish.dto.response.LessonResponse;
+import com.ABCEnglish.dto.response.QuestionResponse;
 import com.ABCEnglish.entity.Course;
 import com.ABCEnglish.entity.Lesson;
+import com.ABCEnglish.entity.LessonTopic;
 import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exception.AppException;
 import com.ABCEnglish.exception.ErrorCode;
@@ -108,5 +110,11 @@ public class LessonService {
             lesson.setStatus(false);
         }
         lessonRepository.saveAll(lessons);
+    }
+    public Page<LessonResponse> getLessonByTopic(String topic, Pageable pageable, String token) throws ParseException, JOSEException {
+        User user = tokenService.getTeacherOrAdmin(token, true);
+        LessonTopic lessonTopic = LessonTopic.valueOf(topic.toUpperCase());
+        Page<Lesson> lessons = lessonRepository.findByTopic(lessonTopic,pageable);
+        return lessons.map(lessonMapper::lessonResponse);
     }
 }

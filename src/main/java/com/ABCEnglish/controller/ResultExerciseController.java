@@ -36,14 +36,11 @@ public class ResultExerciseController {
 
     @GetMapping("/{resultId}")
     public ResultExerciseResponse getResult(@PathVariable Integer resultId,@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) throws ParseException, JOSEException {
-        try {
             String token = authorizationHeader.startsWith("Bearer")
                     ? authorizationHeader.substring("Bearer".length()).trim()
                     : authorizationHeader;
             ResultExerciseResponse result = resultExerciseService.getResult(resultId, token);
             return ApiResponse.<ResultExerciseResponse>builder().result(result).build().getResult();
-        } catch (AppException e){
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+
     }
 }

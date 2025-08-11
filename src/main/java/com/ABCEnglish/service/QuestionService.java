@@ -4,11 +4,8 @@ import com.ABCEnglish.dto.request.*;
 import com.ABCEnglish.dto.response.AnswerMChoiceResponse;
 import com.ABCEnglish.dto.response.QuestionDeleteResponse;
 import com.ABCEnglish.dto.response.QuestionWithAnswersResponse;
-import com.ABCEnglish.entity.AnswerMChoice;
-import com.ABCEnglish.entity.Exercises;
-import com.ABCEnglish.entity.Question;
+import com.ABCEnglish.entity.*;
 import com.ABCEnglish.dto.response.QuestionResponse;
-import com.ABCEnglish.entity.User;
 import com.ABCEnglish.exception.AppException;
 import com.ABCEnglish.exception.ErrorCode;
 import com.ABCEnglish.mapper.AnswerMChoiceMapper;
@@ -138,6 +135,12 @@ public class QuestionService {
     public Page<QuestionResponse> getAllQuestion(Pageable pageable, Integer exerciseId) {
         // thuc hien phan trang
         Page<Question> questions = questionRepository.findByExercise_ExerciseId(pageable,exerciseId);
+        return questions.map(questionMapper::questionResponse);
+    }
+    public Page<QuestionResponse> getQuestionByTopic(String topic, Pageable pageable,String token){
+        User user = tokenService.getTeacherOrAdmin(token,true);
+        QuestionTopic questionTopic = QuestionTopic.valueOf(topic.toUpperCase());
+        Page<Question> questions = questionRepository.findByTopic(questionTopic,pageable);
         return questions.map(questionMapper::questionResponse);
     }
 

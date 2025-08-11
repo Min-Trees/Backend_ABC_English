@@ -15,6 +15,8 @@ public class QuestionRequest {
     String text;
     java.math.BigDecimal score;
     Boolean status;
+    String topic;
+    String level;
     QuestionType questionType;
     SkillType skillType;
 

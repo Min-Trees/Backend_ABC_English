@@ -27,6 +27,8 @@ public class Doc {
     private String description;
     private String url;
     private String images;
+    private DocTopic topic;
+    private Integer level;
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)

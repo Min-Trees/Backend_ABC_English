@@ -19,19 +19,22 @@ public class VerifiTokenEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 512)
     private String token;
 
-    private boolean revoked;
+    @Column(nullable = false)
+    private boolean revoked = false;
 
+    @Column(nullable = false)
     private LocalDateTime expiryDate;
 
     public VerifiTokenEntity(User user, String token) {
         this.user = user;
         this.token = token;
         this.revoked = false;
+        this.expiryDate = LocalDateTime.now().plusHours(24);
     }
 }

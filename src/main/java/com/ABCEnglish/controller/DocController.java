@@ -94,5 +94,16 @@ public class DocController {
         return docService.deleteDoc(courseId,docId, token);
     }
 
+    @GetMapping("/topic/{topic}")
+    public ApiResponse<Page<DocResponse>> getDocByTopic(
+            @PathVariable String topic,
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            Pageable pageable) throws ParseException, JOSEException {
+        String token = authorizationHeader.startsWith("Bearer")
+                ? authorizationHeader.substring("Bearer".length()).trim()
+                : authorizationHeader;
+        Page<DocResponse> result = docService.getDocByTopic(topic,pageable,token);
+        return ApiResponse.<Page<DocResponse>>builder().result(result).build();
+    }
 
 }

@@ -13,4 +13,6 @@ public class LessonRequest {
     String name;
     String content;
     Boolean status;
+    String topic;
+    Integer level;
 }

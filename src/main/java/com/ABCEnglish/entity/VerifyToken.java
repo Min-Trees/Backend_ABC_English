@@ -1,30 +1,38 @@
 package com.ABCEnglish.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "verify_token")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VerifyToken {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "token_id")
     Integer tokenId;
+
+    @Column(nullable = false, unique = true, length = 512)
     String token;
-    @OneToOne
-    @JoinColumn(name = "userId")
-    User userId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    User user;
+
+    @Column(name = "expiry_date", nullable = false)
     LocalDateTime expiryDate;
 
-    public VerifyToken(User userId, String token){
-        this.userId = userId;
+    public VerifyToken(User user, String token) {
+        this.user = user;
         this.token = token;
-        this.expiryDate = LocalDateTime.now().plusMinutes(30);
+        this.expiryDate = LocalDateTime.now().plusMinutes(30); // hoặc bạn tùy chỉnh
     }
 }
