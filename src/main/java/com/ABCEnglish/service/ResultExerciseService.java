@@ -49,7 +49,7 @@ public class ResultExerciseService {
         User user = tokenService.getUserFromToken(token);
         Exercises exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
-        List<Question> allQuestions = questionRepository.findByExercise_ExerciseId(exerciseId);
+//        List<Question> allQuestions = questionRepository.findByExercise_ExerciseIdAndStatusTrue(exerciseId);
         Double totalScore = questionRepository.getTotalScoreByExerciseId(exerciseId);
 
         ResultExercises result = resultExerciseMapper.toResult(exerciseId);
@@ -62,11 +62,18 @@ public class ResultExerciseService {
         resultExerciseRepository.save(result);
         return resultExerciseMapper.resultResponse(result);
     }
-    public ResultExerciseResponse getResult(Integer resultId,String token) throws ParseException, JOSEException {
+//    public ResultExerciseResponse getResult(Integer resultId,String token) throws ParseException, JOSEException {
+//        User user = tokenService.getUserFromToken(token);
+//        ResultExercises response = resultExerciseRepository.findById(resultId)
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//
+//        return resultExerciseMapper.resultResponse(response);
+//    }
+    public ResultExerciseResponse getResult(Integer resultId, String token) throws ParseException, JOSEException {
         User user = tokenService.getUserFromToken(token);
+        System.out.println(user.toString());
         ResultExercises response = resultExerciseRepository.findById(resultId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        return resultExerciseMapper.resultResponse(response);
+                .orElseThrow(() -> new AppException(ErrorCode.EXERCISE_NOT_FOUND));
+        return  resultExerciseMapper.resultResponse(response);
     }
 }

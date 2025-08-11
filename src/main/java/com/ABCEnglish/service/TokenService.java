@@ -79,8 +79,14 @@ public class TokenService {
      * Lấy user từ token nếu tồn tại trong DB
      */
     public User getUserFromToken(String token) {
-        Optional<VerifiTokenEntity> tokenOpt = verificationTokenRepository.findByToken(token);
-        return tokenOpt.map(VerifiTokenEntity::getUser).orElse(null);
+        try {
+            Integer userId = jwtUtil.extractUserId(token);
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
     }
 
     /**

@@ -17,4 +17,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query(value = "SELECT COALESCE(SUM(score), 0) FROM Question WHERE exercise_id = :exerciseId AND status = true", nativeQuery = true)
     Double getTotalScoreByExerciseId(@Param("exerciseId") Integer exerciseId);
     Page<Question> findByTopic(QuestionTopic topic, Pageable pageable);
+    List<Question> findByExercise_ExerciseIdAndStatusTrue(Integer exerciseId);
+
 }
