@@ -17,4 +17,5 @@ public interface ExerciseRepository extends JpaRepository<Exercises, Integer>, J
     @Query("SELECT e FROM Exercises e WHERE e.lesson = :lesson AND e.status = true")
     Page<Exercises> findByLesson(Pageable pageable, Lesson lesson);
     List<Exercises> findByLesson(Lesson lesson);
+    Page<Exercises> findByTitleContainingIgnoreCase(String keyword, Pageable pageable);
 }

@@ -18,4 +18,5 @@ public interface DocRepository extends JpaRepository<Doc, Integer>, JpaSpecifica
     Page<Doc> findAllByLesson(Lesson lesson, Pageable pageable);
     List<Doc> findAllByLesson(Lesson lesson);
     Page<Doc> findByTopic(DocTopic topic, Pageable pageable);
+    Page<Doc> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 }
