@@ -8,7 +8,11 @@ import java.time.LocalDate;
 @Setter
 public class SearchRequest {
     private String keyword;
-    private String courseType; // khóa học, tài liệu, bài kiểm tra, bài học
+    /**
+     * Dataset type to search in.
+     * Allowed values: course, lesson, doc, exercise, all
+     */
+    private String type; // khóa học, tài liệu, bài kiểm tra, bài học
     private Double minPrice;
     private Double maxPrice;
     private LocalDate startDate;
