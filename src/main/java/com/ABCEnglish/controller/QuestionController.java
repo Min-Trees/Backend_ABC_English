@@ -69,11 +69,11 @@ public class QuestionController {
     return ApiResponse.<QuestionResponse>builder().result(result).build().getResult();
     }
 
-//    @GetMapping("/{exerciseId}")
-//    public ResponseEntity<Page<QuestionResponse>> getAllQuestions(Pageable pageable, @PathVariable Integer exerciseId){
-//        Page<QuestionResponse> result = questionService.getAllQuestion(pageable, exerciseId);
-//        return ResponseEntity.ok(result);
-//    }
+    @GetMapping("/{exerciseId}")
+    public ResponseEntity<Page<QuestionResponse>> getAllQuestions(Pageable pageable, @PathVariable Integer exerciseId){
+        Page<QuestionResponse> result = questionService.getAllQuestion(pageable, exerciseId);
+        return ResponseEntity.ok(result);
+    }
 
     @GetMapping("/get-question/{questionId}")
     public ResponseEntity<?> getQuestion(
